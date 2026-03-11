@@ -1,0 +1,13 @@
+芝杜V12:data/ziddo_v12:linux
+华为R22:data/huawei_r22:linux
+移动高清语音遥控:data/cmcc_voice_remote:linux
+G20sPRO:data/g20spro:linux
+Homatics标准遥控器(无数字和四色键):data/homatics_standard_remote:linux
+Homatics高级遥控器(有数字和四色键):data/homatics_premium_remote:linux
+UGOOS_UR02:data/ugoos_ur02:linux
+UGOOS_UR01(am6bplus自带):data/ugoos_ur01:linux
+小湃_RC173S(腾讯极光商店单独出售):data/xiaopai_rc173s:linux
+小湃_RC173(腾讯极光6S自带):data/xiaopai_rc173:linux
+标准键盘:data/keyboard:linux_windows_android
+通用最小适配:data/general_mini:linux_windows_android
+空遥控:data/empty:linux_windows_android

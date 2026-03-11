@@ -1,0 +1,260 @@
+{
+    "name_to_code": {
+        "left": 169,
+        "right": 168,
+        "up": 166,
+        "down": 167,
+        "select": 11,
+        "back": 216,
+        "menu": 247,
+        "info": 195,
+        "display": 213,
+        "title": 229,
+        "play": 234,
+        "pause": 230,
+        "reverse": 226,
+        "forward": 227,
+        "skipplus": 223,
+        "skipminus": 221,
+        "stop": 224,
+        "zero": 207,
+        "one": 206,
+        "two": 205,
+        "three": 204,
+        "four": 203,
+        "five": 202,
+        "six": 201,
+        "seven": 200,
+        "eight": 199,
+        "nine": 198,
+        "power": 196,
+        "mytv": 49,
+        "mymusic": 9,
+        "mypictures": 6,
+        "myvideo": 7,
+        "record": 232,
+        "start": 37,
+        "volumeplus": 208,
+        "volumeminus": 209,
+        "channelplus": 210,
+        "channelminus": 211,
+        "pageplus": 210,
+        "pageminus": 211,
+        "mute": 192,
+        "recordedtv": 101,
+        "guide": 50,
+        "livetv": 24,
+        "liveradio": 248,
+        "epgsearch": 246,
+        "star": 40,
+        "hash": 41,
+        "clear": 249,
+        "enter": 22,
+        "xbox": 213,
+        "playlist": 255,
+        "teletext": 250,
+        "red": 251,
+        "green": 252,
+        "yellow": 253,
+        "blue": 254,
+        "subtitle": 44,
+        "language": 45,
+        "eject": 235,
+        "contentsmenu": 236,
+        "rootmenu": 237,
+        "topmenu": 238,
+        "dvdmenu": 239,
+        "print": 240
+    },
+    "code_to_names": {
+        "169": [
+            "left"
+        ],
+        "168": [
+            "right"
+        ],
+        "166": [
+            "up"
+        ],
+        "167": [
+            "down"
+        ],
+        "11": [
+            "select"
+        ],
+        "216": [
+            "back"
+        ],
+        "247": [
+            "menu"
+        ],
+        "195": [
+            "info"
+        ],
+        "213": [
+            "display",
+            "xbox"
+        ],
+        "229": [
+            "title"
+        ],
+        "234": [
+            "play"
+        ],
+        "230": [
+            "pause"
+        ],
+        "226": [
+            "reverse"
+        ],
+        "227": [
+            "forward"
+        ],
+        "223": [
+            "skipplus"
+        ],
+        "221": [
+            "skipminus"
+        ],
+        "224": [
+            "stop"
+        ],
+        "207": [
+            "zero"
+        ],
+        "206": [
+            "one"
+        ],
+        "205": [
+            "two"
+        ],
+        "204": [
+            "three"
+        ],
+        "203": [
+            "four"
+        ],
+        "202": [
+            "five"
+        ],
+        "201": [
+            "six"
+        ],
+        "200": [
+            "seven"
+        ],
+        "199": [
+            "eight"
+        ],
+        "198": [
+            "nine"
+        ],
+        "196": [
+            "power"
+        ],
+        "49": [
+            "mytv"
+        ],
+        "9": [
+            "mymusic"
+        ],
+        "6": [
+            "mypictures"
+        ],
+        "7": [
+            "myvideo"
+        ],
+        "232": [
+            "record"
+        ],
+        "37": [
+            "start"
+        ],
+        "208": [
+            "volumeplus"
+        ],
+        "209": [
+            "volumeminus"
+        ],
+        "210": [
+            "channelplus",
+            "pageplus"
+        ],
+        "211": [
+            "channelminus",
+            "pageminus"
+        ],
+        "192": [
+            "mute"
+        ],
+        "101": [
+            "recordedtv"
+        ],
+        "50": [
+            "guide"
+        ],
+        "24": [
+            "livetv"
+        ],
+        "248": [
+            "liveradio"
+        ],
+        "246": [
+            "epgsearch"
+        ],
+        "40": [
+            "star"
+        ],
+        "41": [
+            "hash"
+        ],
+        "249": [
+            "clear"
+        ],
+        "22": [
+            "enter"
+        ],
+        "255": [
+            "playlist"
+        ],
+        "250": [
+            "teletext"
+        ],
+        "251": [
+            "red"
+        ],
+        "252": [
+            "green"
+        ],
+        "253": [
+            "yellow"
+        ],
+        "254": [
+            "blue"
+        ],
+        "44": [
+            "subtitle"
+        ],
+        "45": [
+            "language"
+        ],
+        "235": [
+            "eject"
+        ],
+        "236": [
+            "contentsmenu"
+        ],
+        "237": [
+            "rootmenu"
+        ],
+        "238": [
+            "topmenu"
+        ],
+        "239": [
+            "dvdmenu"
+        ],
+        "240": [
+            "print"
+        ]
+    }
+}

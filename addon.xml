@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.controller.switcher" name="Controller Switcher" version="1.0.0" provider-name="forbxy">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>windows android linux</platform>
+    <summary lang="zh_CN">快速切换遥控器,键盘或其他控制配置</summary>
+    <description lang="zh_CN">一键切换适配的遥控器或其他控制设备,同时支持自定义按键映射</description>
+    <license>GPL-2.0</license>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>
