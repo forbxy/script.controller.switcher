@@ -26,7 +26,7 @@ ACTIONS = OrderedDict([
         ("fastforward", "快进"),
         ("rewind", "快退"),
         ("activatewindow(playercontrols)", "打开播放控制器"),
-        ("fullscreen", "全屏"),
+        ("fullscreen", "在菜单与全屏播放界面间切换"),
         ("screenshot", "截屏"),
         ("info", "显示信息"),
         ("contextmenu", "上下文菜单"),
@@ -46,34 +46,35 @@ ACTIONS = OrderedDict([
         ("runscript(plugin.video.filteredmovies, ?mode=delete_skip_point)", "删除片头/片尾时间点标记"),
         ("runscript(plugin.video.filteredmovies, ?mode=open_playing_tvshow)", "打开当前播放电视剧的剧集列表"),
         ("runscript(plugin.video.filteredmovies, ?mode=force_prev)", "强制播放上一个"),
+        ("runscript(plugin.video.filteredmovies, ?mode=toggle_favourite)", "将项目添加到收藏夹或从收藏夹移除"),
         ("runscript(plugin.cloudstorage.webdav.refresh)", "刷新WebDAV/OpenList目录"),
         ("runscript(plugin.cloudstorage.webdav.refresh, recursive=true)", "递归刷新WebDAV/OpenList目录"),
     ])),
-    ("导航", OrderedDict([
-        ("left", "向左"),
-        ("right", "向右"),
-        ("up", "向上"),
-        ("down", "向下"),
-        ("pageup", "上翻页"),
-        ("pagedown", "下翻页"),
+    ("界面导航", OrderedDict([
+        ("left", "向左移动"),
+        ("right", "向右移动"),
+        ("up", "向上移动"),
+        ("down", "向下移动"),
+        ("pageup", "上一页"),
+        ("pagedown", "下一页"),
         ("select", "确认/进入"),
-        ("highlight", "高亮"),
-        ("parentfolder", "上级目录"),
+        ("highlight", "勾选/标记文件(多选操作时)"),
+        ("parentfolder", "返回上级目录"),
         ("back", "返回"),
-        ("previousmenu", "上一级菜单"),
-        ("info", "显示信息"),
-        ("contextmenu", "上下文菜单"),
-        ("menu", "菜单"),
-        ("firstpage", "首页"),
-        ("lastpage", "尾页"),
-        ("nextletter", "下一字母"),
-        ("prevletter", "上一字母"),
-        ("scrollup", "向上滚动"),
-        ("scrolldown", "向下滚动"),
-        ("cursorleft", "光标左移"),
-        ("cursorright", "光标右移"),
+        ("previousmenu", "返回上一级菜单"),
+        ("info", "显示项目信息"),
+        ("contextmenu", "呼出选项菜单(上下文/右键菜单)"),
+        ("menu", "打开侧边栏菜单"),
+        ("firstpage", "跳转至列表首项"),
+        ("lastpage", "跳转至列表末项"),
+        ("nextletter", "在列表中跳转至下一首字母"),
+        ("prevletter", "在列表中跳转至上一首字母"),
+        ("scrollup", "向上平滑滚动"),
+        ("scrolldown", "向下平滑滚动"),
+        ("cursorleft", "输入框光标左移"),
+        ("cursorright", "输入框光标右移"),
     ])),
-    ("播放", OrderedDict([
+    ("播放相关", OrderedDict([
         ("play", "播放"),
         ("pause", "暂停"),
         ("playpause", "播放/暂停"),
@@ -87,74 +88,74 @@ ACTIONS = OrderedDict([
         ("stepback", "步退"),
         ("bigstepforward", "大幅步进"),
         ("bigstepback", "大幅步退"),
-        ("chapterorbigstepforward", "下一章节"),
-        ("chapterorbigstepback", "上一章节"),
         ("osd", "显示播放菜单"),
         ("showtime", "显示时间"),
-        ("playlist", "播放列表"),
-        ("fullscreen", "全屏"),
-        ("aspectratio", "宽高比"),
+        ("playlist", "显示播放列表"),
+        ("fullscreen", "在菜单与全屏播放界面间切换"),
+        ("aspectratio", "循环切换画面显示比例(宽高比)"),
         ("showvideomenu", "显示DVD/蓝光菜单"),
         ("createbookmark", "创建书签"),
         ("createepisodebookmark", "创建剧集书签"),
-        ("togglestereomode", "切换立体模式"),
+        ("togglestereomode", "切换3D模式(Stereo)"),
         ("switchplayer", "切换播放器"),
         ("playnext", "设定为下一个播放/插队"),
-        ("playerprogramselect", "选择播放程序"),
-        ("playerresolutionselect", "选择播放分辨率"),
-        ("verticalshiftup", "垂直向上移动"),
-        ("verticalshiftdown", "垂直向下移动"),
+        ("playerprogramselect", "选择节目流(TS多路复用)"),
+        ("playerresolutionselect", "选择屏幕分辨率(需先配置白名单)"),
+        ("verticalshiftup", "视频画面垂直向上移动(并切换为自定义视图)"),
+        ("verticalshiftdown", "视频画面垂直向下移动(并切换为自定义视图)"),
         ("playercontrol(tempoup)", "播放速度+"),
         ("playercontrol(tempodown)", "播放速度-"),
-        ("nextscene", "下一场景"),
-        ("previousscene", "上一场景"),
+        ("nextscene", "下一场景(需edl场景标记文件)"),
+        ("previousscene", "上一场景(需edl场景标记文件)"),
+        ("chapterorbigstepforward", "下一章节/无章节时大幅步进"),
+        ("chapterorbigstepback", "上一章节/无章节时大幅步退"),
         ("videonextstream", "下一视频流"),
-        ("hdrtoggle", "切换HDR"),
-        ("stereomode", "立体模式"),
-        ("nextstereomode", "下一立体模式"),
-        ("previousstereomode", "上一立体模式"),
-        ("stereomodetomono", "立体模式转单声道"),
+        ("hdrtoggle", "强制开关屏幕HDR状态"),
+        ("stereomode", "打开3D模式(Stereo)选择面板"),
+        ("nextstereomode", "下一3D模式(Stereo)"),
+        ("previousstereomode", "上一3D模式(Stereo)"),
+        ("stereomodetomono", "3D转2D单画面"),
     ])),
-    ("音频", OrderedDict([
+    ("音频相关", OrderedDict([
         ("mute", "静音"),
         ("volumeup", "设备音量+"),
         ("volumedown", "设备音量-"),
         ("audionextlanguage", "切换音轨语言"),
-        ("audiodelay", "音频延迟"),
+        ("audiodelay", "打开音频同步/延迟调节面板"),
         ("audiodelayminus", "音频延迟减少"),
         ("audiodelayplus", "音频延迟增加"),
-        ("audiotoggledigital", "切换数字音频"),
-        ("volampup", "音量软件增益+"),
-        ("volampdown", "音量软件增益-"),
-        ("volumeamplification", "音量软件增益"),
+        ("audiotoggledigital", "开启/关闭音频直通"),
+        ("volampup", "音量软件增益+(dB)"),
+        ("volampdown", "音量软件增益-(dB)"),
+        ("volumeamplification", "打开音量软件增益调节面板"),
     ])),
-    ("图片", OrderedDict([
+    ("图片相关", OrderedDict([
         ("nextpicture", "下一张图片"),
         ("previouspicture", "上一张图片"),
         ("rotate", "顺时针旋转"),
         ("rotateccw", "逆时针旋转"),
         ("zoomout", "缩小"),
         ("zoomin", "放大"),
-        ("zoomnormal", "正常缩放"),
-        ("zoomlevel1", "缩放级别 1"),
-        ("zoomlevel2", "缩放级别 2"),
-        ("zoomlevel3", "缩放级别 3"),
-        ("zoomlevel4", "缩放级别 4"),
-        ("zoomlevel5", "缩放级别 5"),
-        ("zoomlevel6", "缩放级别 6"),
-        ("zoomlevel7", "缩放级别 7"),
-        ("zoomlevel8", "缩放级别 8"),
-        ("zoomlevel9", "缩放级别 9"),
+        ("zoomnormal", "回到正常缩放"),
+        ("zoomlevel1", "切换到缩放级别 1"),
+        ("zoomlevel2", "切换到缩放级别 2"),
+        ("zoomlevel3", "切换到缩放级别 3"),
+        ("zoomlevel4", "切换到缩放级别 4"),
+        ("zoomlevel5", "切换到缩放级别 5"),
+        ("zoomlevel6", "切换到缩放级别 6"),
+        ("zoomlevel7", "切换到缩放级别 7"),
+        ("zoomlevel8", "切换到缩放级别 8"),
+        ("zoomlevel9", "切换到缩放级别 9"),
     ])),
-    ("字幕", OrderedDict([
+    ("字幕相关", OrderedDict([
         ("showsubtitles", "显示/隐藏字幕"),
         ("nextsubtitle", "下一字幕"),
-        ("browsesubtitle", "浏览本地字幕"),
+        ("browsesubtitle", "浏览并手动外挂字幕"),
         ("cyclesubtitle", "循环切换字幕"),
-        ("subtitledelay", "字幕延迟"),
+        ("subtitledelay", "打开字幕同步/延迟调节面板"),
         ("subtitledelayminus", "字幕延迟减少"),
         ("subtitledelayplus", "字幕延迟增加"),
-        ("subtitlealign", "字幕对齐"),
+        ("subtitlealign", "循环切换字幕位置(底部/顶部/画面内等)"),
         ("subtitleshiftup", "字幕向上移动"),
         ("subtitleshiftdown", "字幕向下移动"),
     ])),
@@ -163,30 +164,30 @@ ACTIONS = OrderedDict([
         ("channeldown", "下一频道"),
         ("previouschannelgroup", "上一频道组"),
         ("nextchannelgroup", "下一频道组"),
-        ("playpvr", "播放 PVR"),
-        ("playpvrtv", "播放 PVR 电视"),
-        ("playpvrradio", "播放 PVR 广播"),
-        ("record", "录制"),
-        ("togglecommskip", "切换是否跳过广告"),
-        ("showtimerrule", "显示定时器规则"),
-        ("channelnumberseparator", "频道号码分隔符"),
+        ("playpvr", "播放最新的 PVR"),
+        ("playpvrtv", "播放本地电视(PVR)"),
+        ("playpvrradio", "播放广播电台(PVR)"),
+        ("record", "录制当前节目/设置定时录制"),
+        ("togglecommskip", "开启/关闭自动跳过广播广告"),
+        ("showtimerrule", "打开定时录制规则面板"),
+        ("channelnumberseparator", "数字键: 频道分隔符(如12.1)"),
     ])),
     ("对当前选中项目(音乐,电影或文件等)的操作", OrderedDict([
-        ("queue", "添加到播放列表"),
-        ("delete", "删除"),
-        ("copy", "复制"),
-        ("move", "移动"),
-        ("moveitemup", "上移项目"),
-        ("moveitemdown", "下移项目"),
-        ("rename", "重命名"),
-        ("scanitem", "扫描项目到库"),
+        ("queue", "添加到当前播放队列"),
+        ("delete", "删除文件或从媒体库中移除"),
+        ("copy", "复制项目(主要用于文件管理器)"),
+        ("move", "移动项目(主要用于文件管理器)"),
+        ("moveitemup", "在播放队列中将项目上移"),
+        ("moveitemdown", "在播放队列中将项目下移"),
+        ("rename", "重命名文件或文件夹"),
+        ("scanitem", "单独扫描/刮削该项目到媒体库"),
         ("togglewatched", "切换观看状态(已观看/未观看)"),
-        ("increaserating", "提高评分"),
-        ("decreaserating", "降低评分"),
-        ("setrating", "设置评分"),
+        ("increaserating", "提高评分(仅限正在播放的音乐)"),
+        ("decreaserating", "降低评分(仅限正在播放的音乐)"),
+        ("setrating", "打开评分面板(仅限正在播放的音乐)"),
     ])),
-    ("系统", OrderedDict([
-        ("togglefullscreen", "切换全屏"),
+    ("系统相关", OrderedDict([
+        ("togglefullscreen", "切换Kodi为全屏或窗口化模式"),
         ("minimize", "最小化"),
         ("shutdown", "关机"),
         ("reboot", "重启"),
@@ -201,24 +202,24 @@ ACTIONS = OrderedDict([
         ("reloadskin", "重新加载皮肤"),
     ])),
     ("虚拟键盘", OrderedDict([
-        ("enter", "回车"),
-        ("shift", "Shift"),
-        ("symbols", "符号"),
-        ("backspace", "退格"),
-        ("number0", "数字 0"),
-        ("number1", "数字 1"),
-        ("number2", "数字 2"),
-        ("number3", "数字 3"),
-        ("number4", "数字 4"),
-        ("number5", "数字 5"),
-        ("number6", "数字 6"),
-        ("number7", "数字 7"),
-        ("number8", "数字 8"),
-        ("number9", "数字 9"),
-        ("red", "红键"),
-        ("green", "绿键"),
-        ("yellow", "黄键"),
-        ("blue", "蓝键"),
+        ("enter", "提交/完成输入"),
+        ("shift", "切换大小写"),
+        ("symbols", "切换符号面板"),
+        ("backspace", "退格删除"),
+        ("number0", "数字 0 "),
+        ("number1", "数字 1 "),
+        ("number2", "数字 2 "),
+        ("number3", "数字 3 "),
+        ("number4", "数字 4 "),
+        ("number5", "数字 5 "),
+        ("number6", "数字 6 "),
+        ("number7", "数字 7 "),
+        ("number8", "数字 8 "),
+        ("number9", "数字 9 "),
+        ("red", "红键(通常为退格)"),
+        ("green", "绿键(通常为完成)"),
+        ("yellow", "黄键(通常为Shift)"),
+        ("blue", "蓝键(通常为符号)"),
     ])),
     ("取消与禁用", OrderedDict([
         ("", "擦除预设映射 (穿透到系统)"),
@@ -227,18 +228,18 @@ ACTIONS = OrderedDict([
     ("其他", OrderedDict([
         ("updatelibrary(video)", "更新视频库"),
         ("updatelibrary(music)", "更新音乐库"),
-        ("cleanlibrary(video)", "清理视频库"),
-        ("cleanlibrary(music)", "清理音乐库"),
-        ("playerprocessinfo", "播放器进程信息"),
-        ("playerdebug", "播放器调试信息"),
-        ("playerdebugvideo", "播放器视频调试信息"),
+        ("cleanlibrary(video)", "清理视频库(移除文件已不存在的库记录)"),
+        ("cleanlibrary(music)", "清理音乐库(移除文件已不存在的库记录)"),
+        ("playerprocessinfo", "显示播放器进程信息分析页(音视频解码格式,码率等)"),
+        ("playerdebug", "显示内核播放器调试信息(A-V音画同步,队列及丢帧)"),
+        ("playerdebugvideo", "显示底层视频渲染器调试信息(OpenGL/DX色彩与送显)"),
         ("screenshot", "截屏"),
         ("reloadkeymaps", "重新加载自定义按键"),
-        ("increasepar", "增加PAR"),
-        ("decreasepar", "减少PAR"),
-        ("nextresolution", "下一分辨率"),
-        ("nextcalibration", "下一校准"),
-        ("resetcalibration", "重置校准"),
+        ("increasepar", "拉长画面像素(增加PAR比例)"),
+        ("decreasepar", "压扁画面像素(减少PAR比例)"),
+        ("nextresolution", "[屏显设置专属] 下一分辨率"),
+        ("nextcalibration", "[屏显设置专属] 下一校准步骤"),
+        ("resetcalibration", "[屏显设置专属] 重置校准参数"),
         ("showpreset", "音乐可视化效果->显示预设"),
         ("presetlist", "音乐可视化效果->预设列表"),
         ("nextpreset", "音乐可视化效果->下一预设"),
@@ -247,6 +248,7 @@ ACTIONS = OrderedDict([
         ("randompreset", "音乐可视化效果->随机预设"),
     ])),
     ("打开窗口", OrderedDict([
+        ("SPECIAL_CUSTOM_WINDOW", "自定义窗口ID或名称"),
         ("activatewindow(home)", "主页"),
         ("activatewindow(settings)", "设置"),
         ("activatewindow(systeminfo)", "系统信息"),
@@ -263,7 +265,7 @@ ACTIONS = OrderedDict([
         ("activatewindow(playerprocessinfo)", "播放器进程信息"),
         ("activatewindow(playersettings)", "播放器设置"),
         ("activatewindow(programssettings)", "插件设置"),
-        ("activatewindow(infoprovidersettings)", "信息提供者设置"),
+        ("activatewindow(infoprovidersettings)", "刮削器设置"),
         ("activatewindow(interfacesettings)", "界面设置"),
         ("activatewindow(systemsettings)", "系统设置"),
         ("activatewindow(mediasettings)", "媒体设置"),
@@ -306,7 +308,7 @@ ACTIONS = OrderedDict([
         ("activatewindow(screensaver)", "屏幕保护程序"),
         ("activatewindow(pictureinfo)", "图片信息"),
         ("activatewindow(addoninformation)", "插件信息"),
-        ("activatewindow(musicplaylist)", "音乐播放列表"),
+        ("activatewindow(musicplaylist)", "音乐当前队列(播放列表)"),
         ("activatewindow(musicplaylisteditor)", "音乐播放列表编辑器"),
         ("activatewindow(musicinformation)", "音乐信息"),
         ("activatewindow(songinformation)", "歌曲信息"),
@@ -314,14 +316,14 @@ ACTIONS = OrderedDict([
         ("activatewindow(videomenu)", "视频菜单"),
         ("activatewindow(osdcmssettings)", "色彩管理设置"),
         ("activatewindow(osdsubtitlesettings)", "字幕设置"),
-        ("activatewindow(videotimeseek)", "视频时间跳转"),
-        ("activatewindow(videobookmarks)", "视频书签"),
-        ("activatewindow(videoplaylist)", "视频播放列表"),
+        ("activatewindow(videotimeseek)", "视频步进/时间跳转面板"),
+        ("activatewindow(videobookmarks)", "视频书签管理器"),
+        ("activatewindow(videoplaylist)", "视频当前队列(播放列表)"),
         ("activatewindow(pvrguideinfo)", "PVR 指南信息"),
         ("activatewindow(pvrrecordinginfo)", "PVR 录制信息"),
         ("activatewindow(pvrtimersetting)", "PVR 定时器设置"),
-        ("activatewindow(pvrgroupmanager)", "PVR 组管理器"),
-        ("activatewindow(pvrchannelmanager)", "PVR 频道管理器"),
+        ("activatewindow(pvrgroupmanager)", "PVR 组管理器(频道类别设定)"),
+        ("activatewindow(pvrchannelmanager)", "PVR 频道管理器(隐藏/顺序设定)"),
         ("activatewindow(pvrguidesearch)", "PVR 指南搜索"),
         ("activatewindow(pvrchannelscan)", "PVR 频道扫描"),
         ("activatewindow(pvrupdateprogress)", "PVR 更新进度"),
@@ -339,17 +341,17 @@ ACTIONS = OrderedDict([
         ("activatewindow(radiotimerrules)", "广播定时器规则"),
         ("activatewindow(radiosearch)", "广播搜索"),
         ("activatewindow(pvrradiordsinfo)", "RDS 信息"),
-        ("activatewindow(videos,movies)", "电影库"),
-        ("activatewindow(videos,movietitles)", "电影标题"),
-        ("activatewindow(videos,tvshows)", "剧集库"),
-        ("activatewindow(videos,tvshowtitles)", "剧集标题"),
+        ("activatewindow(videos,movies)", "电影库(分类菜单)"),
+        ("activatewindow(videos,movietitles)", "全部电影(直接显示影片墙)"),
+        ("activatewindow(videos,tvshows)", "剧集库(分类菜单)"),
+        ("activatewindow(videos,tvshowtitles)", "全部剧集(直接显示剧集墙)"),
         ("activatewindow(videos,musicvideos)", "音乐视频"),
         ("activatewindow(videos,recentlyaddedmovies)", "最近添加的电影"),
         ("activatewindow(videos,recentlyaddedepisodes)", "最近添加的剧集"),
         ("activatewindow(videos,recentlyaddedmusicvideos)", "最近添加的音乐视频"),
         ("activatewindow(games)", "游戏库"),
         ("activatewindow(gameosd)", "游戏 OSD"),
-        ("activatewindow(gamepadinput)", "游戏手柄输入"),
+        ("activatewindow(gamepadinput)", "游戏手柄/遥控器输入映射页"),
         ("activatewindow(gamevolume)", "游戏音量"),
         ("activatewindow(managevideoversions)", "视频版本管理"),
         ("activatewindow(managevideoextras)", "视频花絮管理"),
@@ -363,7 +365,7 @@ ACTIONS = OrderedDict([
         ("activatewindow(osdvideosettings)", "视频 OSD 设置"),
         ("activatewindow(osdaudiosettings)", "音频 OSD 设置"),
         ("activatewindow(visualisation)", "可视化"),
-        ("activatewindow(slideshow)", "幻灯片"),
+        ("activatewindow(slideshow)", "幻灯片")        
     ])),
     ("运行插件", "SPECIAL_RUN_ADDON"),
     ("自定义输入", None),
@@ -371,26 +373,26 @@ ACTIONS = OrderedDict([
 
 WINDOWS = OrderedDict([
     ("global", "全局"),
-    ("fullscreenvideo", "全屏播放视频"),
-    ("fullscreenlivetv", "全屏直播电视"),
-    ("fullscreenradio", "全屏直播广播"),
-    ("fullscreengame", "全屏游戏"),
-    ("home", "主界面"),
-    ("programs", "插件/程序"),
-    ("videos", "视频库"),
-    ("music", "音乐库"),
-    ("pictures", "图片库"),
-    ("pvr", "电视/广播"),
-    ("filemanager", "文件管理器"),
-    ("virtualkeyboard", "虚拟键盘"),
-    ("playercontrols", "播放控制器"),
-    ("seekbar", "播放进度条"),
-    ("videoosd", "视频播放页OSD"),
-    ("musicosd", "音乐播放页OSD"),
-    ("osdvideosettings", "OSD内视频设置页"),
-    ("osdaudiosettings", "OSD内音频设置页"),
-    ("visualisation", "音乐可视化"),
-    ("slideshow", "幻灯片"),
+    ("fullscreenvideo", "全屏播放视频时"),
+    ("fullscreenlivetv", "全屏播放电视直播时"),
+    ("fullscreenradio", "全屏播放广播直播时"),
+    ("fullscreengame", "全屏游戏时"),
+    ("home", "在主界面/首页时"),
+    ("programs", "在插件与程序界面时"),
+    ("videos", "在视频库/目录时"),
+    ("music", "在音乐库/目录时"),
+    ("pictures", "在图片库/目录时"),
+    ("pvr", "在电视/广播(PVR)界面时"),
+    ("filemanager", "在文件管理器中时"),
+    ("virtualkeyboard", "虚拟键盘弹出时"),
+    ("playercontrols", "在播放控制器界面时"),
+    ("seekbar", "出现播放跳转/进度条时"),
+    ("videoosd", "视频OSD弹出时"),
+    ("musicosd", "音乐OSD弹出时"),
+    ("osdvideosettings", "视频设置菜单(OSD内)弹出时"),
+    ("osdaudiosettings", "音轨与字幕设置(OSD内)弹出时"),
+    ("visualisation", "在音乐可视化界面时"),
+    ("slideshow", "在图片幻灯片播放时"),
 ])
 
 
@@ -659,21 +661,34 @@ def _select_action():
         idx2 = xbmcgui.Dialog().select("选择动作", labels)
         if idx2 == -1:
             continue
-        return list(actions.keys())[idx2]
+        selected_key = list(actions.keys())[idx2]
+        if selected_key == "SPECIAL_CUSTOM_WINDOW":
+            window_id = xbmcgui.Dialog().input("输入窗口名称或ID")
+            if not window_id:
+                continue
+            return f"activatewindow({window_id.strip()})"
+        return selected_key
 
 
 def _select_window():
     """选择一个窗口上下文，返回 context 字符串或 None"""
-    labels = list(WINDOWS.values())
+    labels = list(WINDOWS.values()) + ["指定窗口ID"]
     idx = xbmcgui.Dialog().select("选择生效范围", labels)
     if idx == -1:
         return None
+    if idx == len(WINDOWS):
+        window_id = xbmcgui.Dialog().input("输入窗口ID (数字)")
+        if not window_id or not window_id.strip().isdigit():
+            return None
+        return f"Window{window_id.strip()}"
     return list(WINDOWS.keys())[idx]
 
 
 def _format_mapping(context, action, keycode):
     window_name = WINDOWS.get(context, context)
-    longpress = " [长按]" if 'longpress' in keycode else ""
+    if context.lower().startswith('window') and context[6:].isdigit():
+        window_name = f"在{context[6:]}窗口时"
+    press_type = " [长按]" if 'longpress' in keycode else " [短按]"
     display_key = keycode.replace(' + longpress', '')
 
     names = ""
@@ -696,7 +711,7 @@ def _format_mapping(context, action, keycode):
     except Exception as e:
         _log(f"读取mapping json失败: {e}")
         
-    return f"[{window_name}] {display_key}{names}{longpress} -> {action}"
+    return f"[{window_name}] {display_key}{names}{press_type} -> {action}"
 
 
 def _save_to_disk(keymap, overwrite_path):
@@ -711,9 +726,11 @@ def _save_to_disk(keymap, overwrite_path):
 def manage_custom_keymap(overwrite_path, remote_name):
     """自定义按键编辑器主菜单"""
     keymap = read_overwrite_keymap(overwrite_path)
+    has_unapplied_changes = False
 
     while True:
-        ops = ["编辑", "应用", "移除"]
+        apply_label = "应用修改 (*)" if has_unapplied_changes else "应用修改"
+        ops = ["编辑按键映射", apply_label, "移除该映射文件"]
         title = f"自定义按键 - {remote_name}"
             
         idx = xbmcgui.Dialog().select(title, ops)
@@ -723,11 +740,13 @@ def manage_custom_keymap(overwrite_path, remote_name):
             
         elif idx == 0:
             # 进入编辑主循环
-            _edit_custom_keymap_loop(keymap, overwrite_path)
+            if _edit_custom_keymap_loop(keymap, overwrite_path):
+                has_unapplied_changes = True
                 
         elif idx == 1:
             # 应用
             xbmc.executebuiltin('Action(ReloadKeymaps)')
+            has_unapplied_changes = False
             _notification("已应用最新配置", title="成功")
             
         elif idx == 2:
@@ -736,15 +755,17 @@ def manage_custom_keymap(overwrite_path, remote_name):
                 keymap.clear()
                 if os.path.exists(overwrite_path):
                     _save_to_disk(keymap, overwrite_path)
+                    has_unapplied_changes = True
                     _notification("已移除磁盘文件，请点击应用使其生效", title="成功")
                 else:
                     _notification(f"{remote_name} 没有已部署的自定义按键", title="提示")
 
 def _edit_custom_keymap_loop(keymap, overwrite_path):
     """自定义按键编辑器内容循环"""
+    changed = False
     while True:
         # 构建菜单
-        menu = ["[添加新按键]"]
+        menu = ["[添加新按键映射]"]
         
         for c, a, k in keymap:
             menu.append(_format_mapping(c, a, k))
@@ -754,7 +775,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
         idx = xbmcgui.Dialog().select(title, menu)
 
         if idx == -1:
-            return
+            return changed
             
         elif idx == 0:
             # 添加新映射：先选范围 → 选动作 → 最后按键
@@ -774,6 +795,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
 
             keymap.append((window, action, keycode))
             _save_to_disk(keymap, overwrite_path)
+            changed = True
             
         else:
             # 编辑/删除已有映射
@@ -781,7 +803,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
             c, a, k = keymap[mapping_idx]
             choice = xbmcgui.Dialog().select(
                 _format_mapping(c, a, k),
-                ["修改按键", "修改动作", "删除此按键"]
+                ["修改按键", "修改生效范围", "修改动作", "删除此按键"]
             )
             if choice == 0:
                 # _notification("请按下新按键...", title="等待按键", duration=3000)
@@ -789,13 +811,20 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
                 if newkey:
                     keymap[mapping_idx] = (c, a, newkey)
                     _save_to_disk(keymap, overwrite_path)
+                    changed = True
             elif choice == 1:
                 new_window = _select_window()
                 if new_window is not None:
-                    new_action = _select_action()
-                    if new_action is not None:
-                        keymap[mapping_idx] = (new_window, new_action, k)
-                        _save_to_disk(keymap, overwrite_path)
+                    keymap[mapping_idx] = (new_window, a, k)
+                    _save_to_disk(keymap, overwrite_path)
+                    changed = True
             elif choice == 2:
+                new_action = _select_action()
+                if new_action is not None:
+                    keymap[mapping_idx] = (c, new_action, k)
+                    _save_to_disk(keymap, overwrite_path)
+                    changed = True
+            elif choice == 3:
                 keymap.pop(mapping_idx)
                 _save_to_disk(keymap, overwrite_path)
+                changed = True

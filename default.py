@@ -132,8 +132,11 @@ def select_remote(remotes):
     sorted_remotes = [item[1] for item in processed_remotes]
     names = [item[2] for item in processed_remotes]
 
-    index = xbmcgui.Dialog().select('选择遥控器', names)
-    return sorted_remotes[index] if index >= 0 else None
+    index = xbmcgui.Dialog().select('选择控制器', names)
+    if index < 0:
+        return None, False
+    is_in_use = processed_remotes[index][0] if index < len(processed_remotes) else False
+    return sorted_remotes[index], is_in_use
 
 def merge_xml_files(base_path, overwrite_path, output_path):
     import xml.etree.ElementTree as ET
@@ -373,8 +376,7 @@ def clear_deployed_files(selected_path, remote_name):
     for px in possible_xmls:
         px_path = os.path.join(keymaps_dir, px)
         if os.path.exists(px_path):
-            bak_path = get_unique_backup_path(px_path)
-            shutil.move(px_path, bak_path)
+            os.remove(px_path)
             cleared += 1
 
     # Linux 下清除该遥控器对应的 hwdb 文件
@@ -385,8 +387,7 @@ def clear_deployed_files(selected_path, remote_name):
             target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
             if os.path.exists(target_hwdb_path):
                 try:
-                    bak_path = get_unique_backup_path(target_hwdb_path)
-                    shutil.move(target_hwdb_path, bak_path)
+                    os.remove(target_hwdb_path)
                     cleared += 1
                 except Exception as e:
                     log(f"清空 hwdb 文件失败 (可能无权限): {e}", xbmc.LOGERROR, sound=True)
@@ -423,13 +424,57 @@ def backup_remove_other_remotes_xmls(keymaps_dir, current_dir_name):
             continue
             
         filepath = os.path.join(keymaps_dir, file)
-        bak_path = get_unique_backup_path(filepath)
-        shutil.move(filepath, bak_path)
+        
+        # 本插件创建的配置文件使用 .saved 备份，以便切换回来时还原
+        if file.startswith('a-') or (file.startswith('z-') and file.endswith('-overwrite.xml')):
+            saved_path = filepath + '.saved'
+            if os.path.exists(saved_path):
+                os.remove(saved_path)
+            shutil.move(filepath, saved_path)
+            log(f"Saved for later restore: {file} -> {file}.saved")
+        else:
+            # 非本插件创建的第三方 xml 使用 .bak 备份
+            bak_path = get_unique_backup_path(filepath)
+            shutil.move(filepath, bak_path)
+            log(f"Backed up third-party xml: {file} -> {os.path.basename(bak_path)}")
+        
         cleared = True
-        log(f"Auto backed up other remote's xml before edit: {file}")
         
     if cleared:
         xbmc.executebuiltin('Action(ReloadKeymaps)')
+
+def get_saved_files(keymaps_dir, dir_name):
+    """检查该遥控器是否有 .saved 备份文件，返回列表"""
+    saved = []
+    candidates = [
+        f"a-{dir_name}.xml.saved",
+        f"a-{dir_name}-merged.xml.saved",
+        f"z-{dir_name}-overwrite.xml.saved",
+    ]
+    for name in candidates:
+        if os.path.exists(os.path.join(keymaps_dir, name)):
+            saved.append(name)
+    return saved
+
+def restore_saved_files(keymaps_dir, dir_name):
+    """还原该遥控器之前保存的所有配置文件"""
+    candidates = [
+        f"a-{dir_name}.xml",
+        f"a-{dir_name}-merged.xml",
+        f"z-{dir_name}-overwrite.xml",
+    ]
+    restored = []
+    for name in candidates:
+        target_path = os.path.join(keymaps_dir, name)
+        saved_path = target_path + '.saved'
+        if os.path.exists(saved_path):
+            # 如果当前已存在同名文件，先移除
+            if os.path.exists(target_path):
+                os.remove(target_path)
+            shutil.move(saved_path, target_path)
+            restored.append(name)
+            log(f"Restored saved config: {name}")
+    return restored
 
 def show_text_file(filepath, title):
     if os.path.exists(filepath):
@@ -442,12 +487,51 @@ def show_text_file(filepath, title):
     else:
         notification('暂未提供此说明文件', title='提示')
 
+def switch_to_remote(selected_path, remote_name):
+    """切换到指定遥控器：备份其他遥控器配置，还原或创建当前遥控器配置"""
+    keymaps_dir = get_keymaps_dir()
+    dir_name = os.path.basename(os.path.normpath(selected_path))
+    
+    # 先备份其他遥控器的配置
+    backup_remove_other_remotes_xmls(keymaps_dir, dir_name)
+    
+    # 尝试还原之前保存的配置
+    saved_files = get_saved_files(keymaps_dir, dir_name)
+    if saved_files:
+        restored = restore_saved_files(keymaps_dir, dir_name)
+        if restored:
+            xbmc.executebuiltin('Action(ReloadKeymaps)')
+            notification(f"已切换到 {remote_name} 并还原之前的配置", title='成功')
+            return
+    
+    # 没有备份，创建用户自定义按键的占位 xml 并部署 hwdb
+    src_hwdb, src_xml, target_xml_name = get_remote_files(selected_path)
+    
+    overwrite_xml_name = f"z-{dir_name}-overwrite.xml"
+    overwrite_path = os.path.join(keymaps_dir, overwrite_xml_name)
+    if not os.path.exists(overwrite_path):
+        with open(overwrite_path, 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n<keymap>\n</keymap>\n')
+    
+    # Linux 下同时部署 hwdb
+    if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb:
+        hwdb_dir = get_hwdb_dir()
+        if deploy_hwdb(src_hwdb, hwdb_dir):
+            try:
+                os.system('systemd-hwdb update')
+                os.system('udevadm trigger')
+            except Exception as e:
+                log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
+    
+    xbmc.executebuiltin('Action(ReloadKeymaps)')
+    notification(f"已切换到 {remote_name}", title='成功')
+
 def main():
     remotes_txt = os.path.join(ADDON_PATH, 'remotes.txt')
     remotes = load_remotes(remotes_txt)
     
     while True:
-        selected = select_remote(remotes)
+        selected, is_in_use = select_remote(remotes)
         if not selected:
             break
 
@@ -457,8 +541,51 @@ def main():
             log(f"找不到目录: {selected['path']}", xbmc.LOGERROR, sound=True)
             continue
 
+        if not is_in_use:
+            # 非当前遥控器：显示切换选项和说明
+            options = ["切换到该控制器"]
+            actions = ["switch"]
+            
+            connect_file = os.path.join(source_dir, 'connect.txt')
+            if os.path.exists(connect_file):
+                options.append("连接说明书")
+                actions.append("connect")
+            desc_file = os.path.join(source_dir, 'desc.txt')
+            if os.path.exists(desc_file):
+                options.append("适配说明书")
+                actions.append("desc")
+            
+            menu_index = xbmcgui.Dialog().select(f"{selected['name']}", options)
+            if menu_index == -1:
+                continue
+            
+            action = actions[menu_index]
+            if action == "switch":
+                switch_to_remote(selected['path'], selected['name'])
+                is_in_use = True
+                # 切换成功后直接进入当前遥控器的完整操作菜单（下方）
+            elif action == "connect":
+                show_text_file(connect_file, f"{selected['name']} 连接与红外学习说明")
+                continue
+            elif action == "desc":
+                show_text_file(desc_file, f"{selected['name']} 遥控器映射说明")
+                continue
+            else:
+                continue
+        
+        if not is_in_use:
+            continue
+            continue
+
+        # 当前遥控器：显示完整操作菜单
         while True:
             src_hwdb, src_xml, target_xml_name = get_remote_files(selected['path'])
+            
+            # 检查默认配置文件是否已加载
+            keymaps_dir = get_keymaps_dir()
+            dir_name = os.path.basename(os.path.normpath(selected['path']))
+            has_default_loaded = os.path.exists(os.path.join(keymaps_dir, f"a-{dir_name}.xml")) or \
+                                 os.path.exists(os.path.join(keymaps_dir, f"a-{dir_name}-merged.xml"))
             
             options = []
             actions = []
@@ -466,21 +593,30 @@ def main():
             if os.path.exists(connect_file):
                 options.append("连接说明书")
                 actions.append("connect")
-            options += ["加载默认适配文件", "移除默认适配文件"]
-            actions += ["replace", "clear"]
+
+            options.append("加载默认适配文件")
+            actions.append("replace")
+            if has_default_loaded:
+                options.append("移除默认适配文件")
+                actions.append("clear")
             desc_file = os.path.join(source_dir, 'desc.txt')
             if os.path.exists(desc_file):
                 options.append("默认适配说明书")
                 actions.append("desc")
-                
-            options.append("编辑已加载默认配置文件")
-            actions.append("edit_default")
+            
+            if has_default_loaded:
+                options.append("编辑已加载的默认配置文件")
+                actions.append("edit_default")
             
             if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb:
                 options.append("加载默认适配文件(仅hwdb文件)")
                 actions.append("replace_hwdb_only")
-                options.append("移除默认适配文件(仅hwdb文件)")
-                actions.append("clear_hwdb_only")
+                hwdb_dir = get_hwdb_dir()
+                if hwdb_dir:
+                    hwdb_name = os.path.basename(src_hwdb)
+                    if os.path.exists(os.path.join(hwdb_dir, hwdb_name)):
+                        options.append("移除默认适配文件(仅hwdb文件)")
+                        actions.append("clear_hwdb_only")
             
             options.append("编辑自定义适配文件")
             actions.append("custom")
@@ -491,7 +627,7 @@ def main():
                 break
             
             action = actions[menu_index]
-            
+
             if action == "replace":
                 if not src_hwdb and not src_xml:
                     notification('所选遥控器缺少配置(hwdb或xml)文件', title='错误')
@@ -505,7 +641,6 @@ def main():
                 elif xbmc.getCondVisibility('System.Platform.Windows'):
                     deploy_windows(src_xml, target_xml_name, selected['name'])
                 else:
-                    # Fallback
                     notification("未知系统平台，尝试通用部署", title="警告")
                     deploy_android(src_xml, target_xml_name, selected['name'])
 
@@ -523,7 +658,7 @@ def main():
                     notification(f"hwdb 需手动处理", title='失败')
                     
             elif action == "clear_hwdb_only":
-                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 hwdb 文件吗？\n（文件将被备份为 .bak）"):
+                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 hwdb 文件吗？"):
                     hwdb_dir = get_hwdb_dir()
                     cleared = 0
                     if hwdb_dir:
@@ -531,8 +666,7 @@ def main():
                         target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
                         if os.path.exists(target_hwdb_path):
                             try:
-                                bak_path = get_unique_backup_path(target_hwdb_path)
-                                shutil.move(target_hwdb_path, bak_path)
+                                os.remove(target_hwdb_path)
                                 cleared += 1
                                 try:
                                     os.system('systemd-hwdb update')
@@ -548,7 +682,7 @@ def main():
                         notification(f"没有找到已部署的 hwdb 文件", title='提示')
                 
             elif action == "clear":
-                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的适配文件吗？\n（文件将被备份为 .bak）"):
+                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的适配文件吗？"):
                     clear_deployed_files(selected['path'], selected['name'])
 
             elif action == "connect":
@@ -562,7 +696,6 @@ def main():
                 keymaps_dir = get_keymaps_dir()
                 dir_name = os.path.basename(os.path.normpath(selected['path']))
                 
-                # 在编辑前备份并移除非当前遥控器的配置文件
                 backup_remove_other_remotes_xmls(keymaps_dir, dir_name)
                 
                 merged_path = os.path.join(keymaps_dir, f"a-{dir_name}-merged.xml")
@@ -583,11 +716,9 @@ def main():
                 
             elif action == "custom":
                 from custom_keymap import manage_custom_keymap
-                # 由 default.py 计算并传递最终的 overwrite xml 完整路径
                 keymaps_dir = get_keymaps_dir()
                 dir_name = os.path.basename(os.path.normpath(selected['path']))
                 
-                # 在编辑前备份并移除非当前遥控器的配置文件
                 backup_remove_other_remotes_xmls(keymaps_dir, dir_name)
                 
                 overwrite_xml_path = os.path.join(keymaps_dir, f"z-{dir_name}-overwrite.xml")

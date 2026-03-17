@@ -12,7 +12,7 @@
             <!-- 快退键长按: 强制播放上一集 -->
             <rewind mod="longpress">RunScript(plugin.video.filteredmovies, ?mode=force_prev)</rewind>
             <!-- 电影键短按: 打开电源库 -->
-            <j>ActivateWindow(Videos)</j>
+            <j>activatewindow(videos,movietitles)</j>
         </keyboard>
     </global>
     <!-- 全屏播放视频时的特定按键映射 -->
