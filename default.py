@@ -142,7 +142,9 @@ def select_remote(remotes, preselect=-1):
     sorted_remotes = [item[1] for item in processed_remotes]
     items_for_ui = [item[2] for item in processed_remotes]
 
-    index = custom_select('选择控制器', items_for_ui, preselect=preselect)
+    index = custom_select('选择控制器', items_for_ui, preselect=preselect, extra_button="打开映射编辑器")
+    if index == -3:
+        return "EDITOR", False, -1
     if index < 0:
         return None, False, -1
     is_in_use = processed_remotes[index][0] if index < len(processed_remotes) else False
@@ -536,13 +538,35 @@ def switch_to_remote(selected_path, remote_name):
     sync_reload_keymaps()
     notification(f"已切换到 {remote_name}", title='成功')
 
+def open_mapping_editor():
+    keymaps_dir = get_keymaps_dir()
+    if not os.path.exists(keymaps_dir):
+        xbmcgui.Dialog().ok("错误", "找不到 keymaps 目录")
+        return
+        
+    xml_files = [f for f in os.listdir(keymaps_dir) if f.lower().endswith('.xml')]
+    if not xml_files:
+        xbmcgui.Dialog().ok("提示", "keymaps 目录下没有找到任何 xml 文件。")
+        return
+        
+    xml_files.sort()
+    index = custom_select("选择要编辑的映射文件", xml_files)
+    if index >= 0:
+        selected_file = xml_files[index]
+        target_xml_path = os.path.join(keymaps_dir, selected_file)
+        from custom_keymap import manage_custom_keymap
+        manage_custom_keymap(target_xml_path, selected_file)
+
 def main():
     remotes_txt = os.path.join(ADDON_PATH, 'remotes.txt')
     remotes = load_remotes(remotes_txt)
     last_remote_index = -1
-    
+
     while True:
         selected, is_in_use, last_remote_index = select_remote(remotes, preselect=last_remote_index)
+        if selected == "EDITOR":
+            open_mapping_editor()
+            continue
         if not selected:
             break
 

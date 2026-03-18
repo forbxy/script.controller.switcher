@@ -19,11 +19,14 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         self.result = -1
         self.back_id = -1
         self.exit_id = -1
+        self.extra_id = -1
+        self.extra_button = None
 
-    def set_items(self, title, items, preselect=0):
+    def set_items(self, title, items, preselect=0, extra_button=None):
         self.dialog_title = title
         self.items = items
         self.preselect_index = max(0, preselect) # 防御性编程
+        self.extra_button = extra_button
 
     def onInit(self):
         try:
@@ -41,28 +44,39 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
             except Exception:
                 pass
                 
-        # 第一个按钮设为返回
-        if len(available_buttons) > 0:
-            self.back_id = available_buttons[0].getId()
+        # 按需分配按钮：附加按钮（如映射编辑器），其次为返回，然后是退出
+        btn_idx = 0
+        
+        if len(available_buttons) > btn_idx and getattr(self, 'extra_button', None):
+            self.extra_id = available_buttons[btn_idx].getId()
             try:
-                available_buttons[0].setVisible(True)
-                available_buttons[0].setLabel("返回")
+                available_buttons[btn_idx].setVisible(True)
+                available_buttons[btn_idx].setLabel(self.extra_button)
             except Exception: pass
+            btn_idx += 1
             
-        # 第二个按钮设为退出
-        if len(available_buttons) > 1:
-            self.exit_id = available_buttons[1].getId()
+        if len(available_buttons) > btn_idx:
+            self.back_id = available_buttons[btn_idx].getId()
             try:
-                available_buttons[1].setVisible(True)
-                available_buttons[1].setLabel("退出")
+                available_buttons[btn_idx].setVisible(True)
+                available_buttons[btn_idx].setLabel("返回")
             except Exception: pass
-            
-        # 隐藏多余的按钮 (比如第三个空白按钮)
-        for btn in available_buttons[2:]:
+            btn_idx += 1
+
+        if len(available_buttons) > btn_idx:
+            self.exit_id = available_buttons[btn_idx].getId()
+            try:
+                available_buttons[btn_idx].setVisible(True)
+                available_buttons[btn_idx].setLabel("退出")
+            except Exception: pass
+            btn_idx += 1
+
+        # 隐藏多余的按钮
+        for btn in available_buttons[btn_idx:]:
             try:
                 btn.setVisible(False)
             except Exception: pass
-        
+            
         # 自动探测是否需要显示图标
         has_icons = any(isinstance(item, dict) and item.get('icon') for item in self.items)
         # 具有图标时首选列表6（图文宽列表），没有图标时首选列表3（纯文本紧凑列表）
@@ -103,6 +117,8 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         xbmc.log(f"[RemoteSwitcher] onClick triggered with controlId: {controlId}", xbmc.LOGINFO)
         if controlId in (6, 3):
             self.result = self.list_control.getSelectedPosition()
+        elif getattr(self, 'extra_id', -1) != -1 and controlId == self.extra_id:
+            self.result = -3
         elif controlId == self.exit_id:
             self.result = -2
         elif controlId == self.back_id:
@@ -125,10 +141,11 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
             except Exception:
                 pass
 
-def custom_select(title, items, preselect=0):
+def custom_select(title, items, preselect=0, extra_button=None):
     import sys
     dialog = CustomSelectDialog("DialogSelect.xml", "")
     dialog.set_items(title, items, preselect)
+    dialog.extra_button = extra_button
     dialog.doModal()
     result = dialog.result
     del dialog
