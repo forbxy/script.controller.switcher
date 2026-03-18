@@ -69,10 +69,15 @@ def sync_directory(src: Path, dst: Path):
 
 def main():
     source = Path(__file__).resolve().parent.parent
-    addons_path = find_kodi_addons_path()
-    if addons_path is None:
-        print("\033[31mCould not find Kodi addons directory at any known location.\033[0m", file=sys.stderr)
-        sys.exit(1)
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "remote":
+        addons_path = Path(r"F:\storage\.kodi\addons")
+        print(f"\033[32mUsing remote Kodi addons directory at: {addons_path}\033[0m")
+    else:
+        addons_path = find_kodi_addons_path()
+        if addons_path is None:
+            print("\033[31mCould not find Kodi addons directory at any known location.\033[0m", file=sys.stderr)
+            sys.exit(1)
 
     dest = addons_path / ADDON_ID
     print("\033[36m============================\033[0m")

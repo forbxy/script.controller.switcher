@@ -128,10 +128,17 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         self.close()
 
     def onAction(self, action):
+        log(action.getId())
         action_id = action.getId()
+        # 92(back), 10(esc)
         if action_id in (92, 10):
             self.result = -1
             self.close()
+        # 122(home键) 等价于点击了退出按钮 (-2) 并打开主页
+        elif action_id == 122:
+            self.result = -2
+            self.close()
+            xbmc.executebuiltin('ActivateWindow(home)')
         elif action_id in (7, 100):
             try:
                 focus_id = self.getFocusId()
