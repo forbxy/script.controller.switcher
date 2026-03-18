@@ -11,13 +11,15 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
+from utils import custom_select,log,sync_reload_keymaps
+
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 
 ACTIONS = OrderedDict([
     ("常用", OrderedDict([
-        ("playerprocessinfo", "播放器进程信息"),
+        ("playerprocessinfo", "显示播放器进程信息分析页(音视频解码格式,码率等)"),
         ("activatewindow(settings)", "设置"),
         ("playpause", "播放/暂停"),
         ("skipnext", "播放下一个"),
@@ -28,14 +30,14 @@ ACTIONS = OrderedDict([
         ("activatewindow(playercontrols)", "打开播放控制器"),
         ("fullscreen", "在菜单与全屏播放界面间切换"),
         ("screenshot", "截屏"),
-        ("info", "显示信息"),
-        ("contextmenu", "上下文菜单"),
+        ("info", "显示项目信息"),
+        ("contextmenu", "打开选项菜单(上下文/右键菜单)"),
         ("audiodelayminus", "音频延迟减少"),
         ("audiodelayplus", "音频延迟增加"),
         ("subtitledelayminus", "字幕延迟减少"),
         ("subtitledelayplus", "字幕延迟增加"),
         ("updatelibrary(video)", "更新视频库"),
-        ("activatewindow(shutdownmenu)", "关机菜单"),
+        ("activatewindow(shutdownmenu)", "打开关机菜单"),
         ("activatewindow(programs)", "打开插件/程序页面"),
     ])),
     ("Forbxy插件", OrderedDict([
@@ -63,7 +65,7 @@ ACTIONS = OrderedDict([
         ("back", "返回"),
         ("previousmenu", "返回上一级菜单"),
         ("info", "显示项目信息"),
-        ("contextmenu", "呼出选项菜单(上下文/右键菜单)"),
+        ("contextmenu", "打开选项菜单(上下文/右键菜单)"),
         ("menu", "打开侧边栏菜单"),
         ("firstpage", "跳转至列表首项"),
         ("lastpage", "跳转至列表末项"),
@@ -234,12 +236,12 @@ ACTIONS = OrderedDict([
         ("playerdebug", "显示内核播放器调试信息(A-V音画同步,队列及丢帧)"),
         ("playerdebugvideo", "显示底层视频渲染器调试信息(OpenGL/DX色彩与送显)"),
         ("screenshot", "截屏"),
-        ("reloadkeymaps", "重新加载自定义按键"),
+        ("reloadkeymaps", "重新加载按键映射文件(使keymaps目录下的修改生效)"),
         ("increasepar", "拉长画面像素(增加PAR比例)"),
         ("decreasepar", "压扁画面像素(减少PAR比例)"),
-        ("nextresolution", "[屏显设置专属] 下一分辨率"),
-        ("nextcalibration", "[屏显设置专属] 下一校准步骤"),
-        ("resetcalibration", "[屏显设置专属] 重置校准参数"),
+        ("nextresolution", "[视频校准专属] 下一分辨率"),
+        ("nextcalibration", "[视频校准专属] 下一校准步骤"),
+        ("resetcalibration", "[视频校准专属] 重置校准参数"),
         ("showpreset", "音乐可视化效果->显示预设"),
         ("presetlist", "音乐可视化效果->预设列表"),
         ("nextpreset", "音乐可视化效果->下一预设"),
@@ -258,10 +260,16 @@ ACTIONS = OrderedDict([
         ("activatewindow(programs)", "插件/程序"),
         ("activatewindow(filemanager)", "文件管理器"),
         ("activatewindow(weather)", "天气"),
-        ("activatewindow(favourites)", "收藏夹"),
+        ("activatewindow(favouritesbrowser)", "浏览收藏页面"),
+        ("activatewindow(addonbrowser)", "浏览插件页面"),
+        ("activatewindow(playercontrols)", "播放控制器"),
         ("activatewindow(pvr)", "电视/广播"),
         ("activatewindow(videoosd)", "视频OSD"),
         ("activatewindow(musicosd)", "音乐OSD"),
+        ("activatewindow(videos,movies)", "电影库(分类菜单)"),
+        ("activatewindow(videos,movietitles)", "全部电影(直接显示影片墙)"),
+        ("activatewindow(videos,tvshows)", "剧集库(分类菜单)"),
+        ("activatewindow(videos,tvshowtitles)", "全部剧集(直接显示剧集墙)"),
         ("activatewindow(playerprocessinfo)", "播放器进程信息"),
         ("activatewindow(playersettings)", "播放器设置"),
         ("activatewindow(programssettings)", "插件设置"),
@@ -282,7 +290,6 @@ ACTIONS = OrderedDict([
         ("activatewindow(gamevideorotation)", "游戏视频旋转"),
         ("activatewindow(gameviewmode)", "游戏视图模式"),
         ("activatewindow(skinsettings)", "皮肤设置"),
-        ("activatewindow(addonbrowser)", "插件浏览器"),
         ("activatewindow(addonsettings)", "插件设置"),
         ("activatewindow(profilesettings)", "配置文件设置"),
         ("activatewindow(locksettings)", "锁定设置"),
@@ -296,7 +303,6 @@ ACTIONS = OrderedDict([
         ("activatewindow(accesspoints)", "接入点"),
         ("activatewindow(mediasource)", "媒体源"),
         ("activatewindow(startwindow)", "启动窗口"),
-        ("activatewindow(favouritesbrowser)", "收藏浏览器"),
         ("activatewindow(contextmenu)", "上下文菜单"),
         ("activatewindow(mediafilter)", "媒体过滤器"),
         ("activatewindow(visualisationpresetlist)", "可视化预设列表"),
@@ -341,11 +347,7 @@ ACTIONS = OrderedDict([
         ("activatewindow(radiotimerrules)", "广播定时器规则"),
         ("activatewindow(radiosearch)", "广播搜索"),
         ("activatewindow(pvrradiordsinfo)", "RDS 信息"),
-        ("activatewindow(videos,movies)", "电影库(分类菜单)"),
-        ("activatewindow(videos,movietitles)", "全部电影(直接显示影片墙)"),
-        ("activatewindow(videos,tvshows)", "剧集库(分类菜单)"),
-        ("activatewindow(videos,tvshowtitles)", "全部剧集(直接显示剧集墙)"),
-        ("activatewindow(videos,musicvideos)", "音乐视频"),
+        ("activatewindow(videos,musicvideos)", "音乐视频库"),
         ("activatewindow(videos,recentlyaddedmovies)", "最近添加的电影"),
         ("activatewindow(videos,recentlyaddedepisodes)", "最近添加的剧集"),
         ("activatewindow(videos,recentlyaddedmusicvideos)", "最近添加的音乐视频"),
@@ -360,12 +362,12 @@ ACTIONS = OrderedDict([
         ("activatewindow(fullscreenradio)", "全屏直播广播"),
         ("activatewindow(fullscreengame)", "全屏游戏"),
         ("activatewindow(virtualkeyboard)", "虚拟键盘"),
-        ("activatewindow(playercontrols)", "播放控制器"),
         ("activatewindow(seekbar)", "进度条"),
         ("activatewindow(osdvideosettings)", "视频 OSD 设置"),
         ("activatewindow(osdaudiosettings)", "音频 OSD 设置"),
         ("activatewindow(visualisation)", "可视化"),
-        ("activatewindow(slideshow)", "幻灯片")        
+        ("activatewindow(slideshow)", "幻灯片"),
+        ("activatewindow(favourites)", "旧版收藏夹(kodi20+请使用浏览收藏页面)")      
     ])),
     ("运行插件", "SPECIAL_RUN_ADDON"),
     ("自定义输入", None),
@@ -396,8 +398,6 @@ WINDOWS = OrderedDict([
 ])
 
 
-def _log(msg, level=xbmc.LOGINFO):
-    xbmc.log(f"[{ADDON_ID}] {msg}", level)
 
 
 def _get_icon_path():
@@ -435,7 +435,7 @@ def read_overwrite_keymap(filepath):
             with open(rm_path, "r", encoding="utf-8") as f:
                 rm_name_to_code = json.load(f).get("name_to_code", {})
     except Exception as e:
-        _log(f"加载mapping json失败以供读取: {e}")
+        log(f"加载mapping json失败以供读取: {e}")
 
     try:
         tree = ET.parse(filepath)
@@ -467,7 +467,7 @@ def read_overwrite_keymap(filepath):
                         key_str += ' + ' + mod
                     mappings.append((context.tag.lower(), action.strip().lower(), key_str))
     except Exception as e:
-        _log(f"读取 overwrite keymap 失败: {e}", xbmc.LOGERROR)
+        log(f"读取 overwrite keymap 失败: {e}", xbmc.LOGERROR)
     return mappings
 
 
@@ -573,7 +573,7 @@ class KeyListener(xbmcgui.WindowXMLDialog):
                         self.getControl(401).reset()
                         self.getControl(401).addLabel("已记录，按住可识别为长按")
                 except Exception as e:
-                    _log(f"更新提示文字失败: {e}", xbmc.LOGERROR)
+                    log(f"更新提示文字失败: {e}", xbmc.LOGERROR)
                 
                 # 0.5s 内如果 Kodi 没有发送带有长按修饰符的事件，则算作短按
                 self.short_press_timer = Timer(1, self._finalize_short_press)
@@ -612,7 +612,7 @@ def _select_action():
     """选择一个 action，返回 action 字符串或 None"""
     while True:
         categories = list(ACTIONS.keys())
-        idx = xbmcgui.Dialog().select("选择动作分类", categories)
+        idx = custom_select("选择动作分类", categories)
         if idx == -1:
             return None
 
@@ -635,18 +635,18 @@ def _select_action():
                         addons.extend([a for a in data['result']['addons'] if a.get('enabled')])
                 except Exception:
                     pass
-            
+
             if not addons:
                 xbmcgui.Dialog().ok("提示", "未找到任何支持运行的插件")
                 continue
-                
+
             addons.sort(key=lambda x: x.get('name', x['addonid']).lower())
             labels = [a.get('name', a['addonid']) for a in addons]
-            
-            idx2 = xbmcgui.Dialog().select("选择要运行的插件", labels)
+
+            idx2 = custom_select("选择要运行的插件", labels)
             if idx2 == -1:
                 continue
-                
+
             return f"RunAddon({addons[idx2]['addonid']})"
 
         if ACTIONS[category] is None:
@@ -658,7 +658,8 @@ def _select_action():
 
         actions = ACTIONS[category]
         labels = [f"{name} ({action_id})" for action_id, name in actions.items()]
-        idx2 = xbmcgui.Dialog().select("选择动作", labels)
+        title = "选择窗口" if category == "打开窗口" else "选择动作"
+        idx2 = custom_select(title, labels)
         if idx2 == -1:
             continue
         selected_key = list(actions.keys())[idx2]
@@ -672,8 +673,9 @@ def _select_action():
 
 def _select_window():
     """选择一个窗口上下文，返回 context 字符串或 None"""
+    
     labels = list(WINDOWS.values()) + ["指定窗口ID"]
-    idx = xbmcgui.Dialog().select("选择生效范围", labels)
+    idx = custom_select("选择生效范围", labels)
     if idx == -1:
         return None
     if idx == len(WINDOWS):
@@ -709,60 +711,55 @@ def _format_mapping(context, action, keycode):
         if name_list:
             names = f"[{','.join(name_list)}]"
     except Exception as e:
-        _log(f"读取mapping json失败: {e}")
+        log(f"读取mapping json失败: {e}")
         
     return f"[{window_name}] {display_key}{names}{press_type} -> {action}"
 
 
 def _save_to_disk(keymap, overwrite_path):
-    """辅助函数：实时保存内存到磁盘"""
+    """辅助函数：实时保存内存到磁盘并立刻生效"""
+    
     if not keymap:
         if os.path.exists(overwrite_path):
             os.remove(overwrite_path)
     else:
         write_overwrite_keymap(keymap, overwrite_path)
+    sync_reload_keymaps()
 
 
 def manage_custom_keymap(overwrite_path, remote_name):
     """自定义按键编辑器主菜单"""
     keymap = read_overwrite_keymap(overwrite_path)
-    has_unapplied_changes = False
+    last_idx = -1
 
     while True:
-        apply_label = "应用修改 (*)" if has_unapplied_changes else "应用修改"
-        ops = ["编辑按键映射", apply_label, "移除该映射文件"]
+        ops = ["编辑按键映射", "移除该映射文件"]
         title = f"自定义按键 - {remote_name}"
-            
-        idx = xbmcgui.Dialog().select(title, ops)
-        
+
+        idx = custom_select(title, ops, preselect=max(last_idx, 0))
+
         if idx == -1:
             break
-            
-        elif idx == 0:
+        last_idx = idx
+
+        if idx == 0:
             # 进入编辑主循环
-            if _edit_custom_keymap_loop(keymap, overwrite_path):
-                has_unapplied_changes = True
-                
+            _edit_custom_keymap_loop(keymap, overwrite_path)
+
         elif idx == 1:
-            # 应用
-            xbmc.executebuiltin('Action(ReloadKeymaps)')
-            has_unapplied_changes = False
-            _notification("已应用最新配置", title="成功")
-            
-        elif idx == 2:
             # 移除自定义映射
             if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {remote_name} 的自定义按键吗？"):
                 keymap.clear()
                 if os.path.exists(overwrite_path):
                     _save_to_disk(keymap, overwrite_path)
-                    has_unapplied_changes = True
-                    _notification("已移除磁盘文件，请点击应用使其生效", title="成功")
+                    _notification("已移除磁盘文件并生效", title="成功")
                 else:
                     _notification(f"{remote_name} 没有已部署的自定义按键", title="提示")
 
 def _edit_custom_keymap_loop(keymap, overwrite_path):
     """自定义按键编辑器内容循环"""
     changed = False
+    last_idx = -1
     while True:
         # 构建菜单
         menu = ["[添加新按键映射]"]
@@ -772,12 +769,14 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
 
         title = f"编辑自定义按键 ({os.path.basename(overwrite_path)})"
             
-        idx = xbmcgui.Dialog().select(title, menu)
+        idx = custom_select(title, menu,
+                            preselect=min(max(last_idx, 0), len(menu) - 1))
 
         if idx == -1:
             return changed
+        last_idx = idx
             
-        elif idx == 0:
+        if idx == 0:
             # 添加新映射：先选范围 → 选动作 → 最后按键
             window = _select_window()
             if window is None:
@@ -792,7 +791,6 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
             if keycode is None:
                 _notification("未捕获到按键", title="取消")
                 continue
-
             keymap.append((window, action, keycode))
             _save_to_disk(keymap, overwrite_path)
             changed = True
@@ -801,7 +799,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
             # 编辑/删除已有映射
             mapping_idx = idx - 1
             c, a, k = keymap[mapping_idx]
-            choice = xbmcgui.Dialog().select(
+            choice = custom_select(
                 _format_mapping(c, a, k),
                 ["修改按键", "修改生效范围", "修改动作", "删除此按键"]
             )

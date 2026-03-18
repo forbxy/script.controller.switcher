@@ -6,6 +6,8 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
+from utils import sync_reload_keymaps,log, custom_select
+
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
@@ -16,8 +18,7 @@ def get_icon_path():
 def notification(message, title="RemoteSwitcher", duration=1000, sound=False):
     xbmcgui.Dialog().notification(title, message, get_icon_path(), duration, sound)
 
-def log(msg, level=xbmc.LOGINFO):
-    xbmc.log(f"[{ADDON_ID}] {msg}", level)
+
 
 def get_keymaps_dir():
     # Kodi keymaps path
@@ -97,9 +98,9 @@ def load_remotes(remotes_txt):
         notification('没有找到任何遥控器配置', title='错误')
     return remotes
 
-def select_remote(remotes):
+def select_remote(remotes, preselect=-1):
     if not remotes:
-        return None
+        return None, False, -1
 
     keymaps_dir = get_keymaps_dir()
 
@@ -120,23 +121,32 @@ def select_remote(remotes):
                     is_in_use = True
                     break
 
-        display_name = r['name']
+        display_name = "\n" + r['name']
         if is_in_use:
             display_name += " [COLOR yellow]←[当前部署设备][/COLOR]"
 
-        processed_remotes.append((is_in_use, r, display_name))
+        icon_path = os.path.join(ADDON_PATH, os.path.normpath(r['path']), "controller.png")
+        if not os.path.exists(icon_path):
+            icon_path = ""
+            
+        item_data = {
+            'label': display_name,
+            'icon': icon_path
+        }
+
+        processed_remotes.append((is_in_use, r, item_data))
 
     # 稳定排序: 正在使用的排在最前面
     processed_remotes.sort(key=lambda x: x[0], reverse=True)
     
     sorted_remotes = [item[1] for item in processed_remotes]
-    names = [item[2] for item in processed_remotes]
+    items_for_ui = [item[2] for item in processed_remotes]
 
-    index = xbmcgui.Dialog().select('选择控制器', names)
+    index = custom_select('选择控制器', items_for_ui, preselect=preselect)
     if index < 0:
-        return None, False
+        return None, False, -1
     is_in_use = processed_remotes[index][0] if index < len(processed_remotes) else False
-    return sorted_remotes[index], is_in_use
+    return sorted_remotes[index], is_in_use, index
 
 def merge_xml_files(base_path, overwrite_path, output_path):
     import xml.etree.ElementTree as ET
@@ -341,22 +351,22 @@ def deploy_linux(src_hwdb, src_xml, target_xml_name, remote_name):
         except Exception as e:
             log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
 
-        xbmc.executebuiltin('Action(ReloadKeymaps)')
+        sync_reload_keymaps()
         notification(f"已成功部署 {remote_name} 默认配置并加载 (Linux)", title='成功')
     else:
-        xbmc.executebuiltin('Action(ReloadKeymaps)')
+        sync_reload_keymaps()
         notification(f"按键映射已更新，但 hwdb 需手动处理", title='部分成功')
 
 def deploy_android(src_xml, target_xml_name, remote_name):
     keymaps_dir = get_keymaps_dir()
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
-    xbmc.executebuiltin('Action(ReloadKeymaps)')
+    sync_reload_keymaps()
     notification(f"已成功部署 {remote_name} 默认配置并加载 (Android)", title='成功')
 
 def deploy_windows(src_xml, target_xml_name, remote_name):
     keymaps_dir = get_keymaps_dir()
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
-    xbmc.executebuiltin('Action(ReloadKeymaps)')
+    sync_reload_keymaps()
     notification(f"已成功部署 {remote_name} 默认配置并加载 (Windows)", title='成功')
 
 def clear_deployed_files(selected_path, remote_name):
@@ -398,7 +408,7 @@ def clear_deployed_files(selected_path, remote_name):
             except Exception as e:
                 log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
 
-    xbmc.executebuiltin('Action(ReloadKeymaps)')
+    sync_reload_keymaps()
     if cleared:
         notification(f"已清空 {remote_name} 的 {cleared} 个适配文件", title='成功')
     else:
@@ -441,7 +451,7 @@ def backup_remove_other_remotes_xmls(keymaps_dir, current_dir_name):
         cleared = True
         
     if cleared:
-        xbmc.executebuiltin('Action(ReloadKeymaps)')
+        sync_reload_keymaps()
 
 def get_saved_files(keymaps_dir, dir_name):
     """检查该遥控器是否有 .saved 备份文件，返回列表"""
@@ -500,7 +510,7 @@ def switch_to_remote(selected_path, remote_name):
     if saved_files:
         restored = restore_saved_files(keymaps_dir, dir_name)
         if restored:
-            xbmc.executebuiltin('Action(ReloadKeymaps)')
+            sync_reload_keymaps()
             notification(f"已切换到 {remote_name} 并还原之前的配置", title='成功')
             return
     
@@ -523,15 +533,16 @@ def switch_to_remote(selected_path, remote_name):
             except Exception as e:
                 log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
     
-    xbmc.executebuiltin('Action(ReloadKeymaps)')
+    sync_reload_keymaps()
     notification(f"已切换到 {remote_name}", title='成功')
 
 def main():
     remotes_txt = os.path.join(ADDON_PATH, 'remotes.txt')
     remotes = load_remotes(remotes_txt)
+    last_remote_index = -1
     
     while True:
-        selected, is_in_use = select_remote(remotes)
+        selected, is_in_use, last_remote_index = select_remote(remotes, preselect=last_remote_index)
         if not selected:
             break
 
@@ -555,7 +566,7 @@ def main():
                 options.append("适配说明书")
                 actions.append("desc")
             
-            menu_index = xbmcgui.Dialog().select(f"{selected['name']}", options)
+            menu_index = custom_select(f"{selected['name']}", options)
             if menu_index == -1:
                 continue
             
@@ -578,6 +589,7 @@ def main():
             continue
 
         # 当前遥控器：显示完整操作菜单
+        last_op_index = -1
         while True:
             src_hwdb, src_xml, target_xml_name = get_remote_files(selected['path'])
             
@@ -621,10 +633,12 @@ def main():
             options.append("编辑自定义适配文件")
             actions.append("custom")
 
-            menu_index = xbmcgui.Dialog().select(f"操作选项 - {selected['name']}", options)
+            menu_index = custom_select(f"操作选项 - {selected['name']}", options,
+                                       preselect=min(last_op_index, len(options) - 1))
             
             if menu_index == -1:
                 break
+            last_op_index = menu_index
             
             action = actions[menu_index]
 
