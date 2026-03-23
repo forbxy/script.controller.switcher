@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.controller.switcher" name="Controller Switcher" version="1.1.3" provider-name="forbxy">
+<addon id="script.controller.switcher" name="Controller Switcher" version="1.1.4" provider-name="forbxy">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
@@ -8,8 +8,8 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <platform>windows android linux</platform>
-    <summary lang="zh_CN">快速切换遥控器,键盘或其他控制配置</summary>
-    <description lang="zh_CN">一键切换适配的遥控器或其他控制设备,同时支持自定义按键映射</description>
+    <summary lang="zh_CN">遥控器适配和自定义按键编辑器</summary>
+    <description lang="zh_CN">项目主页：github.com/forbxy[CR]插件内置了十多个常见遥控的适配方案，遥控某些按键无响应？一键加载立刻解决！[CR][CR]插件同时包含一个非常直观的按键映射编辑器，可以轻松自定义按键功能。</description>
     <license>GPL-2.0</license>
     <assets>
       <icon>icon.png</icon>
