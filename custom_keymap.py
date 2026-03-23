@@ -19,8 +19,8 @@ ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 
 ACTIONS = OrderedDict([
     ("常用", OrderedDict([
-        ("playerprocessinfo", "显示播放器进程信息分析页(音视频解码格式,码率等)"),
-        ("activatewindow(settings)", "设置"),
+        ("playerprocessinfo", "打开播放器进程信息页面(音视频解码格式,码率等)"),
+        ("activatewindow(settings)", "打开设置页面"),
         ("playpause", "播放/暂停"),
         ("skipnext", "播放下一个"),
         ("skipprevious", "播放上一个"),
@@ -28,7 +28,7 @@ ACTIONS = OrderedDict([
         ("fastforward", "快进"),
         ("rewind", "快退"),
         ("activatewindow(playercontrols)", "打开播放控制器"),
-        ("fullscreen", "在菜单与全屏播放界面间切换"),
+        ("fullscreen", "在主页与全屏播放界面间切换"),
         ("screenshot", "截屏"),
         ("info", "显示项目信息"),
         ("contextmenu", "打开选项菜单(上下文/右键菜单)"),
@@ -100,7 +100,7 @@ ACTIONS = OrderedDict([
         ("osd", "显示播放菜单"),
         ("showtime", "显示时间"),
         ("playlist", "显示播放列表"),
-        ("fullscreen", "在菜单与全屏播放界面间切换"),
+        ("fullscreen", "在主页与全屏播放界面间切换"),
         ("aspectratio", "循环切换画面显示比例(宽高比)"),
         ("showvideomenu", "显示DVD/蓝光菜单"),
         ("createbookmark", "创建书签"),
@@ -114,6 +114,7 @@ ACTIONS = OrderedDict([
         ("verticalshiftdown", "视频画面垂直向下移动(并切换为自定义视图)"),
         ("playercontrol(tempoup)", "播放速度+"),
         ("playercontrol(tempodown)", "播放速度-"),
+        ("playercontrol(repeat)", "切换循环播放模式(仅播放音乐时有效)"),
         ("nextscene", "下一场景(需edl场景标记文件)"),
         ("previousscene", "上一场景(需edl场景标记文件)"),
         ("chapterorbigstepforward", "下一章节/无章节时大幅步进"),
@@ -239,9 +240,9 @@ ACTIONS = OrderedDict([
         ("updatelibrary(music)", "更新音乐库"),
         ("cleanlibrary(video)", "清理视频库(移除文件已不存在的库记录)"),
         ("cleanlibrary(music)", "清理音乐库(移除文件已不存在的库记录)"),
-        ("playerprocessinfo", "显示播放器进程信息分析页(音视频解码格式,码率等)"),
-        ("playerdebug", "显示内核播放器调试信息(A-V音画同步,队列及丢帧)"),
-        ("playerdebugvideo", "显示底层视频渲染器调试信息(OpenGL/DX色彩与送显)"),
+        ("playerprocessinfo", "打开播放器进程信息页面(音视频解码格式,码率等)"),
+        ("playerdebug", "打开内核播放器调试信息页面(A-V音画同步,队列及丢帧)"),
+        ("playerdebugvideo", "打开底层视频渲染器调试信息页面(OpenGL/DX色彩与送显)"),
         ("screenshot", "截屏"),
         ("reloadkeymaps", "重新加载按键映射文件(使keymaps目录下的修改生效)"),
         ("increasepar", "拉长画面像素(增加PAR比例)"),
@@ -258,123 +259,123 @@ ACTIONS = OrderedDict([
     ])),
     ("打开窗口", OrderedDict([
         ("SPECIAL_CUSTOM_WINDOW", "自定义窗口ID或名称"),
-        ("activatewindow(home)", "主页"),
-        ("activatewindow(settings)", "设置"),
-        ("activatewindow(systeminfo)", "系统信息"),
-        ("activatewindow(videos)", "视频"),
-        ("activatewindow(music)", "音乐"),
-        ("activatewindow(pictures)", "图片"),
-        ("activatewindow(programs)", "插件/程序"),
-        ("activatewindow(filemanager)", "文件管理器"),
-        ("activatewindow(weather)", "天气"),
+        ("activatewindow(home)", "打开主页"),
+        ("activatewindow(settings)", "打开设置页面"),
+        ("activatewindow(systeminfo)", "打开系统信息页面"),
+        ("activatewindow(videos)", "打开视频页面"),
+        ("activatewindow(music)", "打开音乐页面"),
+        ("activatewindow(pictures)", "打开图片页面"),
+        ("activatewindow(programs)", "打开插件/程序页面"),
+        ("activatewindow(filemanager)", "打开文件管理器页面"),
+        ("activatewindow(weather)", "打开天气页面"),
         ("activatewindow(favouritesbrowser)", "浏览收藏页面"),
         ("activatewindow(addonbrowser)", "浏览插件页面"),
-        ("activatewindow(playercontrols)", "播放控制器"),
-        ("activatewindow(pvr)", "电视/广播"),
-        ("activatewindow(videoosd)", "视频OSD"),
-        ("activatewindow(musicosd)", "音乐OSD"),
-        ("activatewindow(videos,movies)", "电影库(分类菜单)"),
-        ("activatewindow(videos,movietitles)", "全部电影(直接显示影片墙)"),
-        ("activatewindow(videos,tvshows)", "剧集库(分类菜单)"),
-        ("activatewindow(videos,tvshowtitles)", "全部剧集(直接显示剧集墙)"),
-        ("activatewindow(playerprocessinfo)", "播放器进程信息"),
-        ("activatewindow(playersettings)", "播放器设置"),
-        ("activatewindow(programssettings)", "插件设置"),
-        ("activatewindow(infoprovidersettings)", "刮削器设置"),
-        ("activatewindow(interfacesettings)", "界面设置"),
-        ("activatewindow(systemsettings)", "系统设置"),
-        ("activatewindow(mediasettings)", "媒体设置"),
-        ("activatewindow(servicesettings)", "服务设置"),
-        ("activatewindow(appearancesettings)", "外观设置"),
-        ("activatewindow(peripheralsettings)", "外设设置"),
-        ("activatewindow(libexportsettings)", "资料库导出设置"),
-        ("activatewindow(pvrsettings)", "PVR 设置"),
-        ("activatewindow(pvrrecordingsettings)", "PVR 录制设置"),
-        ("activatewindow(gamesettings)", "游戏设置"),
-        ("activatewindow(gameadvancedsettings)", "高级游戏设置"),
-        ("activatewindow(gamecontrollers)", "游戏控制器"),
-        ("activatewindow(gamevideofilter)", "游戏视频滤镜"),
-        ("activatewindow(gamevideorotation)", "游戏视频旋转"),
-        ("activatewindow(gameviewmode)", "游戏视图模式"),
-        ("activatewindow(skinsettings)", "皮肤设置"),
-        ("activatewindow(addonsettings)", "插件设置"),
-        ("activatewindow(profilesettings)", "配置文件设置"),
-        ("activatewindow(locksettings)", "锁定设置"),
-        ("activatewindow(contentsettings)", "内容设置"),
-        ("activatewindow(profiles)", "配置文件"),
-        ("activatewindow(testpattern)", "测试模式"),
-        ("activatewindow(screencalibration)", "屏幕校准"),
-        ("activatewindow(loginscreen)", "登录屏幕"),
-        ("activatewindow(filebrowser)", "文件浏览器"),
-        ("activatewindow(networksetup)", "网络设置"),
-        ("activatewindow(accesspoints)", "接入点"),
-        ("activatewindow(mediasource)", "媒体源"),
-        ("activatewindow(startwindow)", "启动窗口"),
-        ("activatewindow(contextmenu)", "上下文菜单"),
-        ("activatewindow(mediafilter)", "媒体过滤器"),
-        ("activatewindow(visualisationpresetlist)", "可视化预设列表"),
-        ("activatewindow(smartplaylisteditor)", "智能播放列表编辑器"),
-        ("activatewindow(smartplaylistrule)", "智能播放列表规则"),
-        ("activatewindow(shutdownmenu)", "关机菜单"),
-        ("activatewindow(fullscreeninfo)", "全屏信息"),
-        ("activatewindow(subtitlesearch)", "字幕搜索"),
-        ("activatewindow(screensaver)", "屏幕保护程序"),
-        ("activatewindow(pictureinfo)", "图片信息"),
-        ("activatewindow(addoninformation)", "插件信息"),
-        ("activatewindow(musicplaylist)", "音乐当前队列(播放列表)"),
-        ("activatewindow(musicplaylisteditor)", "音乐播放列表编辑器"),
-        ("activatewindow(musicinformation)", "音乐信息"),
-        ("activatewindow(songinformation)", "歌曲信息"),
-        ("activatewindow(movieinformation)", "电影信息"),
-        ("activatewindow(videomenu)", "视频菜单"),
-        ("activatewindow(osdcmssettings)", "色彩管理设置"),
-        ("activatewindow(osdsubtitlesettings)", "字幕设置"),
-        ("activatewindow(videotimeseek)", "视频步进/时间跳转面板"),
-        ("activatewindow(videobookmarks)", "视频书签管理器"),
-        ("activatewindow(videoplaylist)", "视频当前队列(播放列表)"),
-        ("activatewindow(pvrguideinfo)", "PVR 指南信息"),
-        ("activatewindow(pvrrecordinginfo)", "PVR 录制信息"),
-        ("activatewindow(pvrtimersetting)", "PVR 定时器设置"),
-        ("activatewindow(pvrgroupmanager)", "PVR 组管理器(频道类别设定)"),
-        ("activatewindow(pvrchannelmanager)", "PVR 频道管理器(隐藏/顺序设定)"),
-        ("activatewindow(pvrguidesearch)", "PVR 指南搜索"),
-        ("activatewindow(pvrchannelscan)", "PVR 频道扫描"),
-        ("activatewindow(pvrupdateprogress)", "PVR 更新进度"),
-        ("activatewindow(pvrosdchannels)", "PVR OSD 频道"),
-        ("activatewindow(pvrchannelguide)", "PVR OSD 指南"),
-        ("activatewindow(tvchannels)", "电视频道"),
-        ("activatewindow(tvrecordings)", "电视录像"),
-        ("activatewindow(tvguide)", "电视指南"),
-        ("activatewindow(tvtimers)", "电视定时器"),
-        ("activatewindow(tvsearch)", "电视搜索"),
-        ("activatewindow(radiochannels)", "广播频道"),
-        ("activatewindow(radiorecordings)", "广播录音"),
-        ("activatewindow(radioguide)", "广播指南"),
-        ("activatewindow(radiotimers)", "广播定时器"),
-        ("activatewindow(radiotimerrules)", "广播定时器规则"),
-        ("activatewindow(radiosearch)", "广播搜索"),
-        ("activatewindow(pvrradiordsinfo)", "RDS 信息"),
-        ("activatewindow(videos,musicvideos)", "音乐视频库"),
-        ("activatewindow(videos,recentlyaddedmovies)", "最近添加的电影"),
-        ("activatewindow(videos,recentlyaddedepisodes)", "最近添加的剧集"),
-        ("activatewindow(videos,recentlyaddedmusicvideos)", "最近添加的音乐视频"),
-        ("activatewindow(games)", "游戏库"),
-        ("activatewindow(gameosd)", "游戏 OSD"),
-        ("activatewindow(gamepadinput)", "游戏手柄/遥控器输入映射页"),
-        ("activatewindow(gamevolume)", "游戏音量"),
-        ("activatewindow(managevideoversions)", "视频版本管理"),
-        ("activatewindow(managevideoextras)", "视频花絮管理"),
-        ("activatewindow(fullscreenvideo)", "全屏视频"),
-        ("activatewindow(fullscreenlivetv)", "全屏直播电视"),
-        ("activatewindow(fullscreenradio)", "全屏直播广播"),
-        ("activatewindow(fullscreengame)", "全屏游戏"),
-        ("activatewindow(virtualkeyboard)", "虚拟键盘"),
-        ("activatewindow(seekbar)", "进度条"),
-        ("activatewindow(osdvideosettings)", "视频 OSD 设置"),
-        ("activatewindow(osdaudiosettings)", "音频 OSD 设置"),
-        ("activatewindow(visualisation)", "可视化"),
-        ("activatewindow(slideshow)", "幻灯片"),
-        ("activatewindow(favourites)", "旧版收藏夹(kodi20+请使用浏览收藏页面)")      
+        ("activatewindow(playercontrols)", "打开播放控制器页面"),
+        ("activatewindow(pvr)", "打开电视/广播页面"),
+        ("activatewindow(videoosd)", "打开视频OSD页面"),
+        ("activatewindow(musicosd)", "打开音乐OSD页面"),
+        ("activatewindow(videos,movies)", "打开电影库(分类菜单)页面"),
+        ("activatewindow(videos,movietitles)", "打开全部电影(直接显示影片墙)页面"),
+        ("activatewindow(videos,tvshows)", "打开剧集库(分类菜单)页面"),
+        ("activatewindow(videos,tvshowtitles)", "打开全部剧集(直接显示剧集墙)页面"),
+        ("activatewindow(playerprocessinfo)", "打开播放器进程信息页面"),
+        ("activatewindow(playersettings)", "打开播放器设置页面"),
+        ("activatewindow(programssettings)", "打开插件设置页面"),
+        ("activatewindow(infoprovidersettings)", "打开刮削器设置页面"),
+        ("activatewindow(interfacesettings)", "打开界面设置页面"),
+        ("activatewindow(systemsettings)", "打开系统设置页面"),
+        ("activatewindow(mediasettings)", "打开媒体设置页面"),
+        ("activatewindow(servicesettings)", "打开服务设置页面"),
+        ("activatewindow(appearancesettings)", "打开外观设置页面"),
+        ("activatewindow(peripheralsettings)", "打开外设设置页面"),
+        ("activatewindow(libexportsettings)", "打开资料库导出设置页面"),
+        ("activatewindow(pvrsettings)", "打开PVR 设置页面"),
+        ("activatewindow(pvrrecordingsettings)", "打开PVR 录制设置页面"),
+        ("activatewindow(gamesettings)", "打开游戏设置页面"),
+        ("activatewindow(gameadvancedsettings)", "打开高级游戏设置页面"),
+        ("activatewindow(gamecontrollers)", "打开游戏控制器页面"),
+        ("activatewindow(gamevideofilter)", "打开游戏视频滤镜页面"),
+        ("activatewindow(gamevideorotation)", "打开游戏视频旋转页面"),
+        ("activatewindow(gameviewmode)", "打开游戏视图模式页面"),
+        ("activatewindow(skinsettings)", "打开皮肤设置页面"),
+        ("activatewindow(addonsettings)", "打开插件设置页面"),
+        ("activatewindow(profilesettings)", "打开配置文件设置页面"),
+        ("activatewindow(locksettings)", "打开锁定设置页面"),
+        ("activatewindow(contentsettings)", "打开内容设置页面"),
+        ("activatewindow(profiles)", "打开配置文件页面"),
+        ("activatewindow(testpattern)", "打开测试模式页面"),
+        ("activatewindow(screencalibration)", "打开屏幕校准页面"),
+        ("activatewindow(loginscreen)", "打开登录屏幕页面"),
+        ("activatewindow(filebrowser)", "打开文件浏览器页面"),
+        ("activatewindow(networksetup)", "打开网络设置页面"),
+        ("activatewindow(accesspoints)", "打开接入点页面"),
+        ("activatewindow(mediasource)", "打开媒体源页面"),
+        ("activatewindow(startwindow)", "打开启动窗口页面"),
+        ("activatewindow(contextmenu)", "打开上下文菜单页面"),
+        ("activatewindow(mediafilter)", "打开媒体过滤器页面"),
+        ("activatewindow(visualisationpresetlist)", "打开可视化预设列表页面"),
+        ("activatewindow(smartplaylisteditor)", "打开智能播放列表编辑器页面"),
+        ("activatewindow(smartplaylistrule)", "打开智能播放列表规则页面"),
+        ("activatewindow(shutdownmenu)", "打开关机菜单页面"),
+        ("activatewindow(fullscreeninfo)", "打开全屏信息页面"),
+        ("activatewindow(subtitlesearch)", "打开字幕搜索页面"),
+        ("activatewindow(screensaver)", "打开屏幕保护程序页面"),
+        ("activatewindow(pictureinfo)", "打开图片信息页面"),
+        ("activatewindow(addoninformation)", "打开插件信息页面"),
+        ("activatewindow(musicplaylist)", "打开音乐当前队列(播放列表)页面"),
+        ("activatewindow(musicplaylisteditor)", "打开音乐播放列表编辑器页面"),
+        ("activatewindow(musicinformation)", "打开音乐信息页面"),
+        ("activatewindow(songinformation)", "打开歌曲信息页面"),
+        ("activatewindow(movieinformation)", "打开电影信息页面"),
+        ("activatewindow(videomenu)", "打开视频菜单页面"),
+        ("activatewindow(osdcmssettings)", "打开色彩管理设置页面"),
+        ("activatewindow(osdsubtitlesettings)", "打开字幕设置页面"),
+        ("activatewindow(videotimeseek)", "打开视频步进/时间跳转面板页面"),
+        ("activatewindow(videobookmarks)", "打开视频书签管理器页面"),
+        ("activatewindow(videoplaylist)", "打开视频当前队列(播放列表)页面"),
+        ("activatewindow(pvrguideinfo)", "打开PVR 指南信息页面"),
+        ("activatewindow(pvrrecordinginfo)", "打开PVR 录制信息页面"),
+        ("activatewindow(pvrtimersetting)", "打开PVR 定时器设置页面"),
+        ("activatewindow(pvrgroupmanager)", "打开PVR 组管理器(频道类别设定)页面"),
+        ("activatewindow(pvrchannelmanager)", "打开PVR 频道管理器(隐藏/顺序设定)页面"),
+        ("activatewindow(pvrguidesearch)", "打开PVR 指南搜索页面"),
+        ("activatewindow(pvrchannelscan)", "打开PVR 频道扫描页面"),
+        ("activatewindow(pvrupdateprogress)", "打开PVR 更新进度页面"),
+        ("activatewindow(pvrosdchannels)", "打开PVR OSD 频道页面"),
+        ("activatewindow(pvrchannelguide)", "打开PVR OSD 指南页面"),
+        ("activatewindow(tvchannels)", "打开电视频道页面"),
+        ("activatewindow(tvrecordings)", "打开电视录像页面"),
+        ("activatewindow(tvguide)", "打开电视指南页面"),
+        ("activatewindow(tvtimers)", "打开电视定时器页面"),
+        ("activatewindow(tvsearch)", "打开电视搜索页面"),
+        ("activatewindow(radiochannels)", "打开广播频道页面"),
+        ("activatewindow(radiorecordings)", "打开广播录音页面"),
+        ("activatewindow(radioguide)", "打开广播指南页面"),
+        ("activatewindow(radiotimers)", "打开广播定时器页面"),
+        ("activatewindow(radiotimerrules)", "打开广播定时器规则页面"),
+        ("activatewindow(radiosearch)", "打开广播搜索页面"),
+        ("activatewindow(pvrradiordsinfo)", "打开RDS 信息页面"),
+        ("activatewindow(videos,musicvideos)", "打开音乐视频库页面"),
+        ("activatewindow(videos,recentlyaddedmovies)", "打开最近添加的电影页面"),
+        ("activatewindow(videos,recentlyaddedepisodes)", "打开最近添加的剧集页面"),
+        ("activatewindow(videos,recentlyaddedmusicvideos)", "打开最近添加的音乐视频页面"),
+        ("activatewindow(games)", "打开游戏库页面"),
+        ("activatewindow(gameosd)", "打开游戏 OSD 页面"),
+        ("activatewindow(gamepadinput)", "打开游戏手柄/遥控器输入映射页面"),
+        ("activatewindow(gamevolume)", "打开游戏音量页面"),
+        ("activatewindow(managevideoversions)", "打开视频版本管理页面"),
+        ("activatewindow(managevideoextras)", "打开视频花絮管理页面"),
+        ("activatewindow(fullscreenvideo)", "打开全屏视频页面"),
+        ("activatewindow(fullscreenlivetv)", "打开全屏直播电视页面"),
+        ("activatewindow(fullscreenradio)", "打开全屏直播广播页面"),
+        ("activatewindow(fullscreengame)", "打开全屏游戏页面"),
+        ("activatewindow(virtualkeyboard)", "打开虚拟键盘页面"),
+        ("activatewindow(seekbar)", "打开进度条组件"),
+        ("activatewindow(osdvideosettings)", "打开视频 OSD 设置页面"),
+        ("activatewindow(osdaudiosettings)", "打开音频 OSD 设置页面"),
+        ("activatewindow(visualisation)", "打开音乐可视化页面"),
+        ("activatewindow(slideshow)", "打开幻灯片页面"),
+        ("activatewindow(favourites)", "打开旧版收藏夹页面(kodi20+请使用浏览收藏页面)")      
     ])),
     ("运行插件", "SPECIAL_RUN_ADDON"),
     ("自定义输入", None),
@@ -383,8 +384,8 @@ ACTIONS = OrderedDict([
 WINDOWS = OrderedDict([
     ("global", "全局"),
     ("fullscreenvideo", "全屏播放视频时"),
-    ("fullscreenlivetv", "全屏播放电视直播时"),
-    ("fullscreenradio", "全屏播放广播直播时"),
+    ("fullscreenlivetv", "全屏播放电视时"),
+    ("fullscreenradio", "全屏播放广播时"),
     ("fullscreengame", "全屏游戏时"),
     ("home", "在主界面/首页时"),
     ("programs", "在插件与程序界面时"),
@@ -403,8 +404,6 @@ WINDOWS = OrderedDict([
     ("visualisation", "在音乐可视化界面时"),
     ("slideshow", "在图片幻灯片播放时"),
 ])
-
-
 
 
 def _get_icon_path():
@@ -693,6 +692,26 @@ def _select_window():
     return list(WINDOWS.keys())[idx]
 
 
+def _translate_action(action):
+    """将 action 字符串翻译为中文描述"""
+    if not action:
+        return "擦除预设映射 (穿透到系统)"
+    action_lower = action.strip().lower()
+    for category, actions in ACTIONS.items():
+        if isinstance(actions, OrderedDict):
+            for action_id, desc in actions.items():
+                if action_id.lower() == action_lower:
+                    return desc
+    import re
+    m = re.match(r'activatewindow\((.+)\)', action_lower)
+    if m:
+        return f"打开页面({m.group(1)})"
+    m = re.match(r'runaddon\((.+)\)', action_lower)
+    if m:
+        return f"运行插件({m.group(1)})"
+    return action
+
+
 def _format_mapping(context, action, keycode):
     window_name = WINDOWS.get(context, context)
     if context.lower().startswith('window') and context[6:].isdigit():
@@ -700,7 +719,7 @@ def _format_mapping(context, action, keycode):
     press_type = " [长按]" if 'longpress' in keycode else " [短按]"
     display_key = keycode.replace(' + longpress', '')
 
-    names = ""
+    key_display = ""
     try:
         if not hasattr(_format_mapping, "kb_map"):
             _format_mapping.kb_map = {}
@@ -716,11 +735,17 @@ def _format_mapping(context, action, keycode):
                     
         name_list = _format_mapping.kb_map.get(display_key) or _format_mapping.rm_map.get(display_key)
         if name_list:
-            names = f"[{','.join(name_list)}]"
+            key_display = f"{display_key}[[COLOR  yellow]{','.join(name_list)}[/COLOR]]"
+        else:
+            key_display = display_key
     except Exception as e:
         log(f"读取mapping json失败: {e}")
-        
-    return f"[{window_name}] {display_key}{names}{press_type} -> {action}"
+        key_display = display_key
+
+    action_display = _translate_action(action)
+    if action_display != action:
+        action_display = f"[COLOR  yellow]{action_display}[/COLOR] ({action})"
+    return f"[[COLOR  yellow]{window_name}[/COLOR]] {key_display}{press_type} -> {action_display}"
 
 
 def _save_to_disk(keymap, overwrite_path):

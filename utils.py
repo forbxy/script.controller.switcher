@@ -128,7 +128,6 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         self.close()
 
     def onAction(self, action):
-        log(action.getId())
         action_id = action.getId()
         # 92(back), 10(esc)
         if action_id in (92, 10):
