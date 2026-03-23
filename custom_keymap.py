@@ -533,69 +533,28 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
     def __init__(self):
         self.key = None
-        self.first_code = None
-        self.closed = False
-        import threading
-        self.lock = threading.Lock()
 
     def onInit(self):
-        # 尝试设置通知弹窗上的图标 (Kodi通知框图标通常为 Control 400)
         try:
             self.getControl(400).setImage(_get_icon_path())
         except Exception:
             pass
 
         try:
-            self.getControl(401).addLabel("请按下要按键(可长按)...")
+            self.getControl(401).addLabel("请按下要绑定的按键...")
             self.getControl(402).addLabel(f"{self.TIMEOUT} 秒后超时")
         except AttributeError:
-            self.getControl(401).setLabel("请按下要按键(可长按)...")
+            self.getControl(401).setLabel("请按下要绑定的按键...")
             self.getControl(402).setLabel(f"{self.TIMEOUT} 秒后超时")
 
     def onAction(self, action):
         code = action.getButtonCode()
         if code == 0:
             return
-
-        MODIFIER_LONG = 16777216  # 0x01000000
-
-        with self.lock:
-            if self.closed:
-                return
-
-            if code & MODIFIER_LONG:
-                base_code = code & ~MODIFIER_LONG
-                self.key = str(base_code) + ' + longpress'
-                self.close()
-                return
-
-            if self.first_code is None:
-                self.first_code = code
-                try:
-                    # 尝试更新提示文字，捕捉长按意图
-                    try:
-                        self.getControl(401).setLabel("已记录，按住可识别为长按")
-                    except AttributeError:
-                        self.getControl(401).reset()
-                        self.getControl(401).addLabel("已记录，按住可识别为长按")
-                except Exception as e:
-                    log(f"更新提示文字失败: {e}", xbmc.LOGERROR)
-                
-                # 0.5s 内如果 Kodi 没有发送带有长按修饰符的事件，则算作短按
-                self.short_press_timer = Timer(1, self._finalize_short_press)
-                self.short_press_timer.start()
-
-    def _finalize_short_press(self):
-        with self.lock:
-            if not self.closed:
-                self.key = str(self.first_code)
-                self.close()
-
-    def close(self):
-        self.closed = True
-        if hasattr(self, 'short_press_timer'):
-            self.short_press_timer.cancel()
-        super(KeyListener, self).close()
+        # 去掉长按修饰符，只取基础按键码
+        MODIFIER_LONG = 0x01000000
+        self.key = str(code & ~MODIFIER_LONG)
+        self.close()
 
     @staticmethod
     def record_key():
@@ -610,8 +569,14 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
 
 def _record_key_with_longpress():
-    """捕获按键(已支持自动长按识别)，返回 keycode 字符串或 None"""
-    return KeyListener.record_key()
+    """捕获按键，然后询问短按/长按，返回 keycode 字符串或 None"""
+    key = KeyListener.record_key()
+    if key is None:
+        return None
+    lp = xbmcgui.Dialog().yesno("选择按键类型", "选择短按触发或长按触发,遥控器的某些按键可能不支持长按！", yeslabel="长按", nolabel="短按")
+    if lp:
+        key += ' + longpress'
+    return key
 
 
 def _select_action():

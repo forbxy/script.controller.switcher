@@ -128,6 +128,7 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         self.close()
 
     def onAction(self, action):
+        log(f"onAction triggered with action-------: {action}", xbmc.LOGINFO)
         action_id = action.getId()
         # 92(back), 10(esc)
         if action_id in (92, 10):
