@@ -5,6 +5,8 @@ import sys
 import shutil
 from pathlib import Path
 
+REMOTE=True
+
 ADDON_ID = "script.controller.switcher"
 
 EXCLUDE_DIRS = {".git", ".idea", "__pycache__", ".vscode", "venv", "dist"}
@@ -70,7 +72,7 @@ def sync_directory(src: Path, dst: Path):
 def main():
     source = Path(__file__).resolve().parent.parent
     
-    if len(sys.argv) > 1 and sys.argv[1] == "remote":
+    if REMOTE or (len(sys.argv) > 1 and sys.argv[1] == "remote"):
         addons_path = Path(r"F:\storage\.kodi\addons")
         print(f"\033[32mUsing remote Kodi addons directory at: {addons_path}\033[0m")
     else:
