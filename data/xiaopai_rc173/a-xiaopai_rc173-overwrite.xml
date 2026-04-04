@@ -19,6 +19,9 @@
             <!-- 长按home，打开播放器进程信息 -->
             <home mod="longpress">playerprocessinfo</home>
             <browser_home mod="longpress">playerprocessinfo</browser_home>
+            <!-- c键或menu键: 长按打开设置页面 -->
+            <c mod="longpress">ActivateWindow(Settings)</c>
+            <menu mod="longpress">ActivateWindow(Settings)</menu>
         </keyboard>
     </FullscreenVideo>
     <!-- 将对应的操作（除上下方向键）也覆盖给 OSD 菜单，防止弹出菜单时按键失效 -->
@@ -27,6 +30,9 @@
             <!-- 长按home，打开播放器进程信息 -->
             <home mod="longpress">playerprocessinfo</home>
             <browser_home mod="longpress">playerprocessinfo</browser_home>
+            <!-- c键或menu键: 长按打开设置页面 -->
+            <c mod="longpress">ActivateWindow(Settings)</c>
+            <menu mod="longpress">ActivateWindow(Settings)</menu>
         </keyboard>
     </VideoOSD>
 </keymap>

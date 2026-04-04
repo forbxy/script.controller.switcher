@@ -196,12 +196,11 @@ def get_remote_files(selected_path):
     
     addon_source_dir = os.path.join(ADDON_PATH, os.path.normpath(selected_path))
     
-    src_hwdb = None
+    src_hwdb_list = []
     if os.path.exists(addon_source_dir):
-        for file in os.listdir(addon_source_dir):
+        for file in sorted(os.listdir(addon_source_dir)):
             if file.endswith('.hwdb'):
-                src_hwdb = os.path.join(addon_source_dir, file)
-                break
+                src_hwdb_list.append(os.path.join(addon_source_dir, file))
                 
     exact_xml = os.path.join(addon_source_dir, f"a-{dir_name}.xml")
     overwrite_xml = os.path.join(addon_source_dir, f"a-{dir_name}-overwrite.xml")
@@ -225,7 +224,7 @@ def get_remote_files(selected_path):
             src_xml = general_xml
             target_xml_name = f"a-{dir_name}.xml"
 
-    return src_hwdb, src_xml, target_xml_name
+    return src_hwdb_list, src_xml, target_xml_name
 
 def deploy_hwdb(src_hwdb, hwdb_dir):
     if not src_hwdb:
@@ -339,11 +338,14 @@ def deploy_xml(src_xml, keymaps_dir, target_xml_name=None):
             log(f"复制并处理 xml 文件失败: {e}", xbmc.LOGERROR, sound=True)
             shutil.copy2(src_xml, target_path)
 
-def deploy_linux(src_hwdb, src_xml, target_xml_name, remote_name):
+def deploy_linux(src_hwdb_list, src_xml, target_xml_name, remote_name):
     hwdb_dir = get_hwdb_dir()
     keymaps_dir = get_keymaps_dir()
     
-    hwdb_success = deploy_hwdb(src_hwdb, hwdb_dir)
+    hwdb_success = True
+    for src_hwdb in src_hwdb_list:
+        if not deploy_hwdb(src_hwdb, hwdb_dir):
+            hwdb_success = False
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
     
     if hwdb_success:
@@ -372,7 +374,7 @@ def deploy_windows(src_xml, target_xml_name, remote_name):
     notification(f"已成功部署 {remote_name} 默认配置并加载 (Windows)", title='成功')
 
 def clear_deployed_files(selected_path, remote_name):
-    src_hwdb, src_xml, target_xml_name = get_remote_files(selected_path)
+    src_hwdb_list, src_xml, target_xml_name = get_remote_files(selected_path)
     cleared = 0
 
     # 清除该遥控器对应的 xml 文件
@@ -392,17 +394,18 @@ def clear_deployed_files(selected_path, remote_name):
             cleared += 1
 
     # Linux 下清除该遥控器对应的 hwdb 文件
-    if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb:
+    if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb_list:
         hwdb_dir = get_hwdb_dir()
         if hwdb_dir:
-            hwdb_name = os.path.basename(src_hwdb)
-            target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
-            if os.path.exists(target_hwdb_path):
-                try:
-                    os.remove(target_hwdb_path)
-                    cleared += 1
-                except Exception as e:
-                    log(f"清空 hwdb 文件失败 (可能无权限): {e}", xbmc.LOGERROR, sound=True)
+            for src_hwdb in src_hwdb_list:
+                hwdb_name = os.path.basename(src_hwdb)
+                target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
+                if os.path.exists(target_hwdb_path):
+                    try:
+                        os.remove(target_hwdb_path)
+                        cleared += 1
+                    except Exception as e:
+                        log(f"清空 hwdb 文件失败 (可能无权限): {e}", xbmc.LOGERROR, sound=True)
 
             try:
                 os.system('systemd-hwdb update')
@@ -517,7 +520,7 @@ def switch_to_remote(selected_path, remote_name):
             return
     
     # 没有备份，创建用户自定义按键的占位 xml 并部署 hwdb
-    src_hwdb, src_xml, target_xml_name = get_remote_files(selected_path)
+    src_hwdb_list, src_xml, target_xml_name = get_remote_files(selected_path)
     
     overwrite_xml_name = f"z-{dir_name}-overwrite.xml"
     overwrite_path = os.path.join(keymaps_dir, overwrite_xml_name)
@@ -526,9 +529,13 @@ def switch_to_remote(selected_path, remote_name):
             f.write('<?xml version="1.0" encoding="utf-8"?>\n<keymap>\n</keymap>\n')
     
     # Linux 下同时部署 hwdb
-    if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb:
+    if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb_list:
         hwdb_dir = get_hwdb_dir()
-        if deploy_hwdb(src_hwdb, hwdb_dir):
+        all_success = True
+        for src_hwdb in src_hwdb_list:
+            if not deploy_hwdb(src_hwdb, hwdb_dir):
+                all_success = False
+        if all_success:
             try:
                 os.system('systemd-hwdb update')
                 os.system('udevadm trigger')
@@ -615,7 +622,7 @@ def main():
         # 当前遥控器：显示完整操作菜单
         last_op_index = -1
         while True:
-            src_hwdb, src_xml, target_xml_name = get_remote_files(selected['path'])
+            src_hwdb_list, src_xml, target_xml_name = get_remote_files(selected['path'])
             
             # 检查默认配置文件是否已加载
             keymaps_dir = get_keymaps_dir()
@@ -644,13 +651,16 @@ def main():
                 options.append("编辑已加载的默认配置文件")
                 actions.append("edit_default")
             
-            if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb:
+            if xbmc.getCondVisibility('System.Platform.Linux') and src_hwdb_list:
                 options.append("加载默认适配文件(仅hwdb文件)")
                 actions.append("replace_hwdb_only")
                 hwdb_dir = get_hwdb_dir()
                 if hwdb_dir:
-                    hwdb_name = os.path.basename(src_hwdb)
-                    if os.path.exists(os.path.join(hwdb_dir, hwdb_name)):
+                    any_hwdb_deployed = any(
+                        os.path.exists(os.path.join(hwdb_dir, os.path.basename(h)))
+                        for h in src_hwdb_list
+                    )
+                    if any_hwdb_deployed:
                         options.append("移除默认适配文件(仅hwdb文件)")
                         actions.append("clear_hwdb_only")
             
@@ -667,13 +677,13 @@ def main():
             action = actions[menu_index]
 
             if action == "replace":
-                if not src_hwdb and not src_xml:
+                if not src_hwdb_list and not src_xml:
                     notification('所选遥控器缺少配置(hwdb或xml)文件', title='错误')
                     log(f"所选遥控器缺少配置(hwdb或xml)文件: {selected['path']}", xbmc.LOGERROR, sound=True)
                     continue
 
                 if xbmc.getCondVisibility('System.Platform.Linux'):
-                    deploy_linux(src_hwdb, src_xml, target_xml_name, selected['name'])
+                    deploy_linux(src_hwdb_list, src_xml, target_xml_name, selected['name'])
                 elif xbmc.getCondVisibility('System.Platform.Android'):
                     deploy_android(src_xml, target_xml_name, selected['name'])
                 elif xbmc.getCondVisibility('System.Platform.Windows'):
@@ -684,7 +694,10 @@ def main():
 
             elif action == "replace_hwdb_only":
                 hwdb_dir = get_hwdb_dir()
-                hwdb_success = deploy_hwdb(src_hwdb, hwdb_dir)
+                hwdb_success = True
+                for src_hwdb in src_hwdb_list:
+                    if not deploy_hwdb(src_hwdb, hwdb_dir):
+                        hwdb_success = False
                 if hwdb_success:
                     try:
                         os.system('systemd-hwdb update')
@@ -700,22 +713,25 @@ def main():
                     hwdb_dir = get_hwdb_dir()
                     cleared = 0
                     if hwdb_dir:
-                        hwdb_name = os.path.basename(src_hwdb)
-                        target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
-                        if os.path.exists(target_hwdb_path):
-                            try:
-                                os.remove(target_hwdb_path)
-                                cleared += 1
+                        for src_hwdb in src_hwdb_list:
+                            hwdb_name = os.path.basename(src_hwdb)
+                            target_hwdb_path = os.path.join(hwdb_dir, hwdb_name)
+                            if os.path.exists(target_hwdb_path):
                                 try:
-                                    os.system('systemd-hwdb update')
-                                    os.system('udevadm trigger')
+                                    os.remove(target_hwdb_path)
+                                    cleared += 1
                                 except Exception as e:
-                                    log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
+                                    log(f"清空 hwdb 文件失败 (可能无权限): {e}", xbmc.LOGERROR, sound=True)
+
+                        if cleared:
+                            try:
+                                os.system('systemd-hwdb update')
+                                os.system('udevadm trigger')
                             except Exception as e:
-                                log(f"清空 hwdb 文件失败 (可能无权限): {e}", xbmc.LOGERROR, sound=True)
+                                log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
 
                     if cleared:
-                        notification(f"已清空 hwdb 文件", title='成功')
+                        notification(f"已清空 {cleared} 个 hwdb 文件", title='成功')
                     else:
                         notification(f"没有找到已部署的 hwdb 文件", title='提示')
                 

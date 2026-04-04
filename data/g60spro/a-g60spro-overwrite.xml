@@ -6,6 +6,9 @@
             <f5 mod="meta">RunScript(plugin.video.filteredmovies, 0, ?mode=launch_t9)</f5>
             <h mod="meta">noop</h>
             <leftwindows mod="meta">noop</leftwindows>
+             <!-- c键或menu键: 长按打开设置页面 -->
+            <c mod="longpress">ActivateWindow(Settings)</c>
+            <menu mod="longpress">ActivateWindow(Settings)</menu>
         </keyboard>
     </global>
     
@@ -21,6 +24,9 @@
             <pageup mod="longpress">RunScript(plugin.video.filteredmovies, ?mode=record_skip_point)</pageup>
             <!-- PG-长按: 删除片头/片尾时间点标记 -->
             <pagedown mod="longpress">RunScript(plugin.video.filteredmovies,?mode=delete_skip_point)</pagedown>
+             <!-- c键或menu键: 长按打开设置页面 -->
+            <c mod="longpress">ActivateWindow(Settings)</c>
+            <menu mod="longpress">ActivateWindow(Settings)</menu>
         </keyboard>
     </FullscreenVideo>
     <!-- 将对应的操作（除上下方向键）也覆盖给 OSD 菜单，防止弹出菜单时按键失效 -->
@@ -31,6 +37,9 @@
             <pageup mod="longpress">RunScript(plugin.video.filteredmovies, ?mode=record_skip_point)</pageup>
             <!-- PG-长按: 删除片头/片尾时间点标记 -->
             <pagedown mod="longpress">RunScript(plugin.video.filteredmovies,?mode=delete_skip_point)</pagedown>
+             <!-- c键或menu键: 长按打开设置页面 -->
+            <c mod="longpress">ActivateWindow(Settings)</c>
+            <menu mod="longpress">ActivateWindow(Settings)</menu>
         </keyboard>
     </VideoOSD>
 </keymap>
