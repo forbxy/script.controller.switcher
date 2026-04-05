@@ -1,6 +1,8 @@
 芝杜V12:data/ziddo_v12:linux_windows_android
 华为R22:data/huawei_r22:linux_windows_android
-移动高清语音遥控:data/cmcc_voice_remote:linux_windows_android
+移动高清(4红外学习):data/cmcc_voice_remote:linux_windows_android
+移动高清(7学习键无医生键):data/cmcc_voice_remote_7l:linux_windows_android
+移动高清(7学习键有医生键):data/cmcc_voice_remote_7l_doctor:linux_windows_android
 G10sPRO:data/g10spro:linux_windows_android
 G20sPRO:data/g20spro:linux_windows_android
 G60sPRO:data/g60spro:linux_windows_android
