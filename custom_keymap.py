@@ -405,6 +405,34 @@ WINDOWS = OrderedDict([
     ("slideshow", "在图片幻灯片播放时"),
 ])
 
+JOYSTICK_FEATURES = OrderedDict([
+    ("a", "A (底部)"),
+    ("b", "B (右侧)"),
+    ("x", "X (左侧)"),
+    ("y", "Y (顶部)"),
+    ("start", "开始"),
+    ("back", "返回"),
+    ("guide", "指南"),
+    ("up", "十字键 上"),
+    ("down", "十字键 下"),
+    ("left", "十字键 左"),
+    ("right", "十字键 右"),
+    ("leftbumper", "左肩键 LB"),
+    ("rightbumper", "右肩键 RB"),
+    ("lefttrigger", "左扳机 LT"),
+    ("righttrigger", "右扳机 RT"),
+    ("leftthumb", "左摇杆按下"),
+    ("rightthumb", "右摇杆按下"),
+    ("leftstick@up", "左摇杆 上"),
+    ("leftstick@down", "左摇杆 下"),
+    ("leftstick@left", "左摇杆 左"),
+    ("leftstick@right", "左摇杆 右"),
+    ("rightstick@up", "右摇杆 上"),
+    ("rightstick@down", "右摇杆 下"),
+    ("rightstick@left", "右摇杆 左"),
+    ("rightstick@right", "右摇杆 右"),
+])
+
 
 def _get_icon_path():
     return os.path.join(ADDON_PATH, "icon.png")
@@ -449,6 +477,19 @@ def read_overwrite_keymap(filepath):
         for context in root:
             for device in context:
                 device_type = device.tag.lower()
+                if device_type == 'joystick':
+                    for mapping in device:
+                        feature_name = mapping.tag.lower()
+                        holdtime = mapping.get('holdtime', '')
+                        direction = mapping.get('direction', '')
+                        action = mapping.text or ''
+                        key_str = f"joystick:{feature_name}"
+                        if direction:
+                            key_str = f"joystick:{feature_name}@{direction}"
+                        if holdtime:
+                            key_str += f" + holdtime={holdtime}"
+                        mappings.append((context.tag.lower(), action.strip().lower(), key_str))
+                    continue
                 for mapping in device:
                     if mapping.tag.lower() == 'key':
                         keycode = mapping.get('id')
@@ -501,9 +542,11 @@ def write_overwrite_keymap(keymap, filepath):
     builder.start("keymap", {})
     for context in contexts:
         builder.start(context, {})
-        builder.start("keyboard", {})
-        for c, a, k in keymap:
-            if c == context:
+
+        kb_entries = [(c, a, k) for c, a, k in keymap if c == context and not k.startswith('joystick:')]
+        if kb_entries:
+            builder.start("keyboard", {})
+            for c, a, k in kb_entries:
                 parts = k.split(' + ')
                 attrs = {"id": parts[0]}
                 if len(parts) > 1:
@@ -511,7 +554,28 @@ def write_overwrite_keymap(keymap, filepath):
                 builder.start("key", attrs)
                 builder.data(a)
                 builder.end("key")
-        builder.end("keyboard")
+            builder.end("keyboard")
+
+        joy_entries = [(c, a, k) for c, a, k in keymap if c == context and k.startswith('joystick:')]
+        if joy_entries:
+            builder.start("joystick", {"profile": "game.controller.default"})
+            for c, a, k in joy_entries:
+                feature = k[len('joystick:'):]
+                parts = feature.split(' + ')
+                feature_part = parts[0]
+                attrs = {}
+                if '@' in feature_part:
+                    feature_name, direction = feature_part.split('@', 1)
+                    attrs['direction'] = direction
+                else:
+                    feature_name = feature_part
+                if len(parts) > 1 and parts[1].startswith('holdtime='):
+                    attrs['holdtime'] = parts[1].split('=', 1)[1]
+                builder.start(feature_name, attrs)
+                builder.data(a)
+                builder.end(feature_name)
+            builder.end("joystick")
+
         builder.end(context)
     builder.end("keymap")
     element = builder.close()
@@ -577,6 +641,36 @@ def _record_key_with_longpress():
     if lp:
         key += ' + longpress'
     return key
+
+
+def _record_joystick_key():
+    """选择手柄按键，返回 joystick:feature 或 joystick:feature + holdtime=500"""
+    features = list(JOYSTICK_FEATURES.keys())
+    labels = [f"{name} ({fid})" for fid, name in JOYSTICK_FEATURES.items()]
+    idx = custom_select("选择手柄按键", labels)
+    if idx == -1:
+        return None
+    feature = features[idx]
+    lp = xbmcgui.Dialog().yesno("选择按键类型", "选择短按触发或长按触发", yeslabel="长按", nolabel="短按")
+    key_str = f"joystick:{feature}"
+    if lp:
+        key_str += " + holdtime=500"
+    return key_str
+
+
+def _record_key_choose_type(controller_type=''):
+    """选择输入设备类型并录入按键"""
+    if controller_type == 'game_controller':
+        return _record_joystick_key()
+    elif controller_type in ('remote', 'keyboard'):
+        return _record_key_with_longpress()
+    # controller_type未指定时，弹窗选择
+    idx = custom_select("选择输入设备", ["遥控器/键盘", "手柄(Joystick)"])
+    if idx == -1:
+        return None
+    if idx == 0:
+        return _record_key_with_longpress()
+    return _record_joystick_key()
 
 
 def _select_action():
@@ -681,31 +775,40 @@ def _format_mapping(context, action, keycode):
     window_name = WINDOWS.get(context, context)
     if context.lower().startswith('window') and context[6:].isdigit():
         window_name = f"在{context[6:]}窗口时"
-    press_type = " [长按]" if 'longpress' in keycode else " [短按]"
-    display_key = keycode.replace(' + longpress', '')
 
-    key_display = ""
-    try:
-        if not hasattr(_format_mapping, "kb_map"):
-            _format_mapping.kb_map = {}
-            _format_mapping.rm_map = {}
-            kb_path = os.path.join(ADDON_PATH, "data", "keyboard_mapping.json")
-            if os.path.exists(kb_path):
-                with open(kb_path, "r", encoding="utf-8") as f:
-                    _format_mapping.kb_map = json.load(f).get("code_to_names", {})
-            rm_path = os.path.join(ADDON_PATH, "data", "remote_mapping.json")
-            if os.path.exists(rm_path):
-                with open(rm_path, "r", encoding="utf-8") as f:
-                    _format_mapping.rm_map = json.load(f).get("code_to_names", {})
-                    
-        name_list = _format_mapping.kb_map.get(display_key) or _format_mapping.rm_map.get(display_key)
-        if name_list:
-            key_display = f"{display_key}[[COLOR  yellow]{','.join(name_list)}[/COLOR]]"
-        else:
+    if keycode.startswith('joystick:'):
+        feature = keycode[len('joystick:'):]
+        parts = feature.split(' + ')
+        feature_part = parts[0]
+        press_type = " [长按]" if len(parts) > 1 else " [短按]"
+        joy_label = JOYSTICK_FEATURES.get(feature_part, feature_part)
+        key_display = f"手柄:[COLOR yellow]{joy_label}[/COLOR]"
+    else:
+        press_type = " [长按]" if 'longpress' in keycode else " [短按]"
+        display_key = keycode.replace(' + longpress', '')
+
+        key_display = ""
+        try:
+            if not hasattr(_format_mapping, "kb_map"):
+                _format_mapping.kb_map = {}
+                _format_mapping.rm_map = {}
+                kb_path = os.path.join(ADDON_PATH, "data", "keyboard_mapping.json")
+                if os.path.exists(kb_path):
+                    with open(kb_path, "r", encoding="utf-8") as f:
+                        _format_mapping.kb_map = json.load(f).get("code_to_names", {})
+                rm_path = os.path.join(ADDON_PATH, "data", "remote_mapping.json")
+                if os.path.exists(rm_path):
+                    with open(rm_path, "r", encoding="utf-8") as f:
+                        _format_mapping.rm_map = json.load(f).get("code_to_names", {})
+
+            name_list = _format_mapping.kb_map.get(display_key) or _format_mapping.rm_map.get(display_key)
+            if name_list:
+                key_display = f"{display_key}[[COLOR  yellow]{','.join(name_list)}[/COLOR]]"
+            else:
+                key_display = display_key
+        except Exception as e:
+            log(f"读取mapping json失败: {e}")
             key_display = display_key
-    except Exception as e:
-        log(f"读取mapping json失败: {e}")
-        key_display = display_key
 
     action_display = _translate_action(action)
     if action_display != action:
@@ -724,8 +827,13 @@ def _save_to_disk(keymap, overwrite_path):
     sync_reload_keymaps()
 
 
-def manage_custom_keymap(overwrite_path, remote_name):
+def manage_custom_keymap(overwrite_path, remote_name, controller_type=''):
     """自定义按键编辑器主菜单"""
+    if not controller_type:
+        idx = custom_select("选择该文件对应的输入设备类型", ["遥控器/键盘", "手柄(Joystick)"])
+        if idx == -1:
+            return
+        controller_type = 'remote' if idx == 0 else 'game_controller'
     keymap = read_overwrite_keymap(overwrite_path)
     last_idx = -1
 
@@ -741,7 +849,7 @@ def manage_custom_keymap(overwrite_path, remote_name):
 
         if idx == 0:
             # 进入编辑主循环
-            _edit_custom_keymap_loop(keymap, overwrite_path)
+            _edit_custom_keymap_loop(keymap, overwrite_path, controller_type)
 
         elif idx == 1:
             # 移除自定义映射
@@ -753,7 +861,7 @@ def manage_custom_keymap(overwrite_path, remote_name):
                 else:
                     _notification(f"{remote_name} 没有已部署的自定义按键", title="提示")
 
-def _edit_custom_keymap_loop(keymap, overwrite_path):
+def _edit_custom_keymap_loop(keymap, overwrite_path, controller_type=''):
     """自定义按键编辑器内容循环"""
     changed = False
     last_idx = -1
@@ -783,8 +891,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
             if action is None:
                 continue
 
-            # _notification("请按下遥控器按键...", title="等待按键", duration=3000)
-            keycode = _record_key_with_longpress()
+            keycode = _record_key_choose_type(controller_type)
             if keycode is None:
                 _notification("未捕获到按键", title="取消")
                 continue
@@ -801,8 +908,7 @@ def _edit_custom_keymap_loop(keymap, overwrite_path):
                 ["修改按键", "修改生效范围", "修改动作", "删除此按键"]
             )
             if choice == 0:
-                # _notification("请按下新按键...", title="等待按键", duration=3000)
-                newkey = _record_key_with_longpress()
+                newkey = _record_key_choose_type(controller_type)
                 if newkey:
                     keymap[mapping_idx] = (c, a, newkey)
                     _save_to_disk(keymap, overwrite_path)

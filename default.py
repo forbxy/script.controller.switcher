@@ -67,7 +67,7 @@ def get_unique_backup_path(filepath):
 
 def load_remotes(remotes_txt):
     if not os.path.exists(remotes_txt):
-        notification('找不到 remotes.txt', title='错误')
+        notification('找不到 controllers.txt', title='错误')
         return []
 
     remotes = []
@@ -92,7 +92,7 @@ def load_remotes(remotes_txt):
                 if system_hw not in platforms.split('_'):
                     continue
                     
-            remotes.append({'name': name, 'path': path})
+            remotes.append({'name': name, 'path': path, 'controller_type': parts[3].strip() if len(parts) > 3 else 'remote'})
     
     if not remotes:
         notification('没有找到任何遥控器配置', title='错误')
@@ -166,7 +166,15 @@ def merge_xml_files(base_path, overwrite_path, output_path):
                 continue
                 
             for over_device in over_window:
-                base_device = base_window.find(over_device.tag)
+                # 匹配设备时同时比较 name/profile 属性（joystick 需要按 profile 区分）
+                over_dev_name = over_device.get('name')
+                over_dev_profile = over_device.get('profile')
+                base_device = None
+                for bd in base_window:
+                    if (bd.tag == over_device.tag and bd.get('name') == over_dev_name
+                            and bd.get('profile') == over_dev_profile):
+                        base_device = bd
+                        break
                 if base_device is None:
                     base_window.append(over_device)
                     continue
@@ -174,10 +182,12 @@ def merge_xml_files(base_path, overwrite_path, output_path):
                 for over_key in over_device:
                     key_id = over_key.get('id')
                     key_mod = over_key.get('mod')
+                    key_limit = over_key.get('limit')
                     
                     existing_key = None
                     for k in base_device:
-                        if k.tag == over_key.tag and k.get('id') == key_id and k.get('mod') == key_mod:
+                        if (k.tag == over_key.tag and k.get('id') == key_id
+                                and k.get('mod') == key_mod and k.get('limit') == key_limit):
                             existing_key = k
                             break
                             
@@ -225,6 +235,62 @@ def get_remote_files(selected_path):
             target_xml_name = f"a-{dir_name}.xml"
 
     return src_hwdb_list, src_xml, target_xml_name
+
+def get_joystick_buttonmaps_base_dir():
+    return xbmcvfs.translatePath('special://userdata/addon_data/peripheral.joystick/resources/buttonmaps/xml/')
+
+def get_joystick_source_files(selected_path):
+    addon_source_dir = os.path.join(ADDON_PATH, os.path.normpath(selected_path))
+    joystick_dir = os.path.join(addon_source_dir, 'joystick')
+    files = []
+    if os.path.exists(joystick_dir) and os.path.isdir(joystick_dir):
+        for provider in sorted(os.listdir(joystick_dir)):
+            provider_dir = os.path.join(joystick_dir, provider)
+            if os.path.isdir(provider_dir):
+                for f in sorted(os.listdir(provider_dir)):
+                    if f.endswith('.xml'):
+                        files.append((provider, f, os.path.join(provider_dir, f)))
+    return files
+
+def deploy_joystick(joystick_files):
+    base_dir = get_joystick_buttonmaps_base_dir()
+    deployed = 0
+    for provider, filename, src_path in joystick_files:
+        target_dir = os.path.join(base_dir, provider)
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        target_path = os.path.join(target_dir, filename)
+        if os.path.exists(target_path):
+            try:
+                import hashlib
+                with open(src_path, 'rb') as f:
+                    src_hash = hashlib.md5(f.read()).hexdigest()
+                with open(target_path, 'rb') as f:
+                    target_hash = hashlib.md5(f.read()).hexdigest()
+                if src_hash == target_hash:
+                    log(f"Joystick button map 已存在且一致，跳过: {provider}/{filename}", level=xbmc.LOGINFO)
+                    continue
+            except Exception:
+                pass
+        try:
+            shutil.copy2(src_path, target_path)
+            deployed += 1
+        except Exception as e:
+            log(f"部署 joystick button map 失败: {provider}/{filename}: {e}", xbmc.LOGERROR, sound=True)
+    return deployed
+
+def clear_joystick(joystick_files):
+    base_dir = get_joystick_buttonmaps_base_dir()
+    cleared = 0
+    for provider, filename, src_path in joystick_files:
+        target_path = os.path.join(base_dir, provider, filename)
+        if os.path.exists(target_path):
+            try:
+                os.remove(target_path)
+                cleared += 1
+            except Exception as e:
+                log(f"清除 joystick button map 失败: {provider}/{filename}: {e}", xbmc.LOGERROR, sound=True)
+    return cleared
 
 def deploy_hwdb(src_hwdb, hwdb_dir):
     if not src_hwdb:
@@ -338,7 +404,7 @@ def deploy_xml(src_xml, keymaps_dir, target_xml_name=None):
             log(f"复制并处理 xml 文件失败: {e}", xbmc.LOGERROR, sound=True)
             shutil.copy2(src_xml, target_path)
 
-def deploy_linux(src_hwdb_list, src_xml, target_xml_name, remote_name):
+def deploy_linux(src_hwdb_list, src_xml, target_xml_name, remote_name, joystick_files=None):
     hwdb_dir = get_hwdb_dir()
     keymaps_dir = get_keymaps_dir()
     
@@ -347,6 +413,8 @@ def deploy_linux(src_hwdb_list, src_xml, target_xml_name, remote_name):
         if not deploy_hwdb(src_hwdb, hwdb_dir):
             hwdb_success = False
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
+    if joystick_files:
+        deploy_joystick(joystick_files)
     
     if hwdb_success:
         try:
@@ -361,15 +429,19 @@ def deploy_linux(src_hwdb_list, src_xml, target_xml_name, remote_name):
         sync_reload_keymaps()
         notification(f"按键映射已更新，但 hwdb 需手动处理", title='部分成功')
 
-def deploy_android(src_xml, target_xml_name, remote_name):
+def deploy_android(src_xml, target_xml_name, remote_name, joystick_files=None):
     keymaps_dir = get_keymaps_dir()
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
+    if joystick_files:
+        deploy_joystick(joystick_files)
     sync_reload_keymaps()
     notification(f"已成功部署 {remote_name} 默认配置并加载 (Android)", title='成功')
 
-def deploy_windows(src_xml, target_xml_name, remote_name):
+def deploy_windows(src_xml, target_xml_name, remote_name, joystick_files=None):
     keymaps_dir = get_keymaps_dir()
     deploy_xml(src_xml, keymaps_dir, target_xml_name)
+    if joystick_files:
+        deploy_joystick(joystick_files)
     sync_reload_keymaps()
     notification(f"已成功部署 {remote_name} 默认配置并加载 (Windows)", title='成功')
 
@@ -412,6 +484,11 @@ def clear_deployed_files(selected_path, remote_name):
                 os.system('udevadm trigger')
             except Exception as e:
                 log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
+
+    # 清除 joystick button map 文件
+    joystick_files = get_joystick_source_files(selected_path)
+    if joystick_files:
+        cleared += clear_joystick(joystick_files)
 
     sync_reload_keymaps()
     if cleared:
@@ -542,6 +619,11 @@ def switch_to_remote(selected_path, remote_name):
             except Exception as e:
                 log(f"刷新 hwdb 失败: {e}", xbmc.LOGERROR, sound=True)
     
+    # 部署 joystick button map
+    joystick_files = get_joystick_source_files(selected_path)
+    if joystick_files:
+        deploy_joystick(joystick_files)
+    
     sync_reload_keymaps()
     notification(f"已切换到 {remote_name}", title='成功')
 
@@ -565,7 +647,7 @@ def open_mapping_editor():
         manage_custom_keymap(target_xml_path, selected_file)
 
 def main():
-    remotes_txt = os.path.join(ADDON_PATH, 'remotes.txt')
+    remotes_txt = os.path.join(ADDON_PATH, 'controllers.txt')
     remotes = load_remotes(remotes_txt)
     last_remote_index = -1
 
@@ -664,6 +746,19 @@ def main():
                         options.append("移除默认适配文件(仅hwdb文件)")
                         actions.append("clear_hwdb_only")
             
+            joystick_files = get_joystick_source_files(selected['path'])
+            if joystick_files:
+                options.append("加载默认适配文件(仅joystick按钮映射)")
+                actions.append("replace_joystick_only")
+                joy_base_dir = get_joystick_buttonmaps_base_dir()
+                any_joystick_deployed = any(
+                    os.path.exists(os.path.join(joy_base_dir, provider, filename))
+                    for provider, filename, _ in joystick_files
+                )
+                if any_joystick_deployed:
+                    options.append("移除默认适配文件(仅joystick按钮映射)")
+                    actions.append("clear_joystick_only")
+            
             options.append("编辑自定义适配文件")
             actions.append("custom")
 
@@ -677,17 +772,18 @@ def main():
             action = actions[menu_index]
 
             if action == "replace":
-                if not src_hwdb_list and not src_xml:
-                    notification('所选遥控器缺少配置(hwdb或xml)文件', title='错误')
-                    log(f"所选遥控器缺少配置(hwdb或xml)文件: {selected['path']}", xbmc.LOGERROR, sound=True)
+                joy_files = get_joystick_source_files(selected['path'])
+                if not src_hwdb_list and not src_xml and not joy_files:
+                    notification('所选遥控器缺少配置文件', title='错误')
+                    log(f"所选遥控器缺少配置文件: {selected['path']}", xbmc.LOGERROR, sound=True)
                     continue
 
                 if xbmc.getCondVisibility('System.Platform.Linux'):
-                    deploy_linux(src_hwdb_list, src_xml, target_xml_name, selected['name'])
+                    deploy_linux(src_hwdb_list, src_xml, target_xml_name, selected['name'], joy_files)
                 elif xbmc.getCondVisibility('System.Platform.Android'):
-                    deploy_android(src_xml, target_xml_name, selected['name'])
+                    deploy_android(src_xml, target_xml_name, selected['name'], joy_files)
                 elif xbmc.getCondVisibility('System.Platform.Windows'):
-                    deploy_windows(src_xml, target_xml_name, selected['name'])
+                    deploy_windows(src_xml, target_xml_name, selected['name'], joy_files)
                 else:
                     notification("未知系统平台，尝试通用部署", title="警告")
                     deploy_android(src_xml, target_xml_name, selected['name'])
@@ -708,6 +804,23 @@ def main():
                 else:
                     notification(f"hwdb 需手动处理", title='失败')
                     
+            elif action == "replace_joystick_only":
+                joy_files = get_joystick_source_files(selected['path'])
+                deployed = deploy_joystick(joy_files)
+                if deployed:
+                    notification(f"已部署 {deployed} 个 joystick 按钮映射文件", title='成功')
+                else:
+                    notification(f"joystick 按钮映射文件已是最新", title='提示')
+
+            elif action == "clear_joystick_only":
+                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 joystick 按钮映射文件吗？"):
+                    joy_files = get_joystick_source_files(selected['path'])
+                    cleared = clear_joystick(joy_files)
+                    if cleared:
+                        notification(f"已清除 {cleared} 个 joystick 按钮映射文件", title='成功')
+                    else:
+                        notification(f"没有找到已部署的 joystick 按钮映射文件", title='提示')
+
             elif action == "clear_hwdb_only":
                 if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 hwdb 文件吗？"):
                     hwdb_dir = get_hwdb_dir()
@@ -766,7 +879,7 @@ def main():
                 if not target_xml_path or not os.path.exists(target_xml_path):
                     xbmcgui.Dialog().ok("提示", "您尚未加载该设备的默认配置文件。\n请先执行 [加载默认适配文件]。")
                 else:
-                    manage_custom_keymap(target_xml_path, f"{selected['name']} (默认配置)")
+                    manage_custom_keymap(target_xml_path, f"{selected['name']} (默认配置)", controller_type=selected.get('controller_type', ''))
                 
             elif action == "custom":
                 from custom_keymap import manage_custom_keymap
@@ -777,7 +890,7 @@ def main():
                 
                 overwrite_xml_path = os.path.join(keymaps_dir, f"z-{dir_name}-overwrite.xml")
                 
-                manage_custom_keymap(overwrite_xml_path, selected['name'])
+                manage_custom_keymap(overwrite_xml_path, selected['name'], controller_type=selected.get('controller_type', ''))
 
 if __name__ == '__main__':
     main()
