@@ -13,7 +13,8 @@ UGOOS_UR02:data/ugoos_ur02:linux_windows_android
 UGOOS_UR01(am6bplus自带):data/ugoos_ur01:linux_windows_android
 T1遥控:data/t1_remote:linux_windows_android
 小湃_RC173S(腾讯极光商店单独出售):data/xiaopai_rc173s:linux_windows_android
-小湃_RC173(腾讯极光6S自带):data/xiaopai_rc173:linux_windows_android
+小湃_RC173(腾讯极光6S等自带):data/xiaopai_rc173:linux_windows_android
+小湃_RC173_2(腾讯极光5X等自带):data/xiaopai_rc173_2:linux_windows_android
 八位堂micro手柄:data/8bitdo_micro_gamepad:linux_windows_android:gamepad
 空手柄:data/empty_gamepad:linux_windows_android:gamepad
 标准键盘:data/keyboard:linux_windows_android
