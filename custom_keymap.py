@@ -860,6 +860,7 @@ def manage_custom_keymap(overwrite_path, remote_name, controller_type=''):
                     _notification("已移除磁盘文件并生效", title="成功")
                 else:
                     _notification(f"{remote_name} 没有已部署的自定义按键", title="提示")
+                break
 
 def _edit_custom_keymap_loop(keymap, overwrite_path, controller_type=''):
     """自定义按键编辑器内容循环"""

@@ -5,6 +5,7 @@
 移动高清(7学习键有医生键):data/cmcc_voice_remote_7l_doctor:linux_windows_android
 G10sPRO:data/g10spro:linux_windows_android
 G20sPRO:data/g20spro:linux_windows_android
+G23PRO:data/g23pro:linux_windows_android
 G60sPRO:data/g60spro:linux_windows_android
 Homatics标准遥控器(无数字和四色键):data/homatics_standard_remote:linux_windows_android
 Homatics高级遥控器(有数字和四色键):data/homatics_premium_remote:linux_windows_android

@@ -29,7 +29,7 @@ HWDB绑定参考
 11、‘*’号键->英文点.(当位于7下方时,kodi中为period),backspace(当位于9下方时)
 12、数字0-9->0-9(kodi中为zero->nine)
 13、快进快退->rewind,fastforward或r,f
-14、上一曲下一曲->previoussong,nextsong(当遥控有快进快退键时),rewind,fastforward(当遥控没有快进快退键时)
+14、上一曲下一曲->previoussong,nextsong
 ！！！当遥控没有快进快退时，把这个绑定成快进快退，在kodi层通过长按来实现上一曲下一曲
 15、停止播放->x或stopcd(kodi中为stop)
 16、暂停/播放->playpause(kodi中为play_pause)
