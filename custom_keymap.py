@@ -660,7 +660,7 @@ def _record_joystick_key():
 
 def _record_key_choose_type(controller_type=''):
     """选择输入设备类型并录入按键"""
-    if controller_type == 'game_controller':
+    if controller_type == 'gamepad':
         return _record_joystick_key()
     elif controller_type in ('remote', 'keyboard'):
         return _record_key_with_longpress()
@@ -833,7 +833,7 @@ def manage_custom_keymap(overwrite_path, remote_name, controller_type=''):
         idx = custom_select("选择该文件对应的输入设备类型", ["遥控器/键盘", "手柄(Joystick)"])
         if idx == -1:
             return
-        controller_type = 'remote' if idx == 0 else 'game_controller'
+        controller_type = 'remote' if idx == 0 else 'gamepad'
     keymap = read_overwrite_keymap(overwrite_path)
     last_idx = -1
 
