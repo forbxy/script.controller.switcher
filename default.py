@@ -632,15 +632,30 @@ def open_mapping_editor():
     if not os.path.exists(keymaps_dir):
         xbmcgui.Dialog().ok("错误", "找不到 keymaps 目录")
         return
-        
-    xml_files = [f for f in os.listdir(keymaps_dir) if f.lower().endswith('.xml')]
-    if not xml_files:
-        xbmcgui.Dialog().ok("提示", "keymaps 目录下没有找到任何 xml 文件。")
-        return
-        
-    xml_files.sort()
-    index = custom_select("选择要编辑的映射文件", xml_files)
-    if index >= 0:
+
+    while True:
+        xml_files = [f for f in os.listdir(keymaps_dir) if f.lower().endswith('.xml')]
+        xml_files.sort()
+
+        menu = xml_files + ["[新建映射文件]"]
+        index = custom_select("选择要编辑的映射文件", menu)
+        if index == -1:
+            break
+        if index == len(xml_files):
+            # 新建映射文件
+            name = xbmcgui.Dialog().input("输入文件名")
+            if not name:
+                continue
+            if not name.lower().endswith('.xml'):
+                name += '.xml'
+            new_path = os.path.join(keymaps_dir, name)
+            if os.path.exists(new_path):
+                xbmcgui.Dialog().ok("提示", f"{name} 已存在")
+                continue
+            with open(new_path, 'w', encoding='utf-8') as f:
+                f.write('')
+            notification(f"已创建 {name}", title='成功')
+            continue
         selected_file = xml_files[index]
         target_xml_path = os.path.join(keymaps_dir, selected_file)
         from custom_keymap import manage_custom_keymap
