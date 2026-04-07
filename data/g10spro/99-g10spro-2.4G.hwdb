@@ -2,3 +2,4 @@
 evdev:input:b0003v1915p1025*
  KEYBOARD_KEY_c00cf=f5                #语音键
  KEYBOARD_KEY_c0041=enter             #ok键
+ KEYBOARD_KEY_10081=s                 #关机键
