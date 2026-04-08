@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Standalone DialogTextViewer - Arctic Horizon dark rounded style -->
+<window>
+	<defaultcontrol always="true">5</defaultcontrol>
+	<animation type="WindowOpen" reversible="false">
+		<effect type="fade" start="0" end="100" time="300" />
+		<effect type="slide" start="0,-48" end="0" tween="back" easing="out" time="400" />
+	</animation>
+	<animation type="WindowClose" reversible="false">
+		<effect type="fade" start="100" end="0" time="200" />
+	</animation>
+	<controls>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<height>750</height>
+			<width>1220</width>
+
+			<!-- Click-to-close overlay -->
+			<control type="button">
+				<left>-2000</left>
+				<top>-2000</top>
+				<width>6000</width>
+				<height>6000</height>
+				<texturefocus />
+				<texturenofocus />
+				<onclick>Action(close)</onclick>
+			</control>
+
+			<!-- Dialog background group -->
+			<control type="group">
+				<width>1220</width>
+				<height>750</height>
+
+				<!-- Shadow -->
+				<control type="image">
+					<left>-20</left>
+					<top>-20</top>
+					<right>-20</right>
+					<bottom>-20</bottom>
+					<texture border="32" colordiffuse="80000000">shadows/shadow-20.png</texture>
+				</control>
+
+				<!-- Rounded dialog background (dark) -->
+				<control type="image">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texture border="16" colordiffuse="FF212125">common/dialog.png</texture>
+				</control>
+
+				<!-- Title bar area -->
+				<control type="label" id="1">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<height>70</height>
+					<font>font32_title</font>
+					<textcolor>FFededed</textcolor>
+					<align>center</align>
+					<aligny>center</aligny>
+					<label></label>
+				</control>
+
+				<!-- Title bottom separator -->
+				<control type="image">
+					<left>20</left>
+					<top>70</top>
+					<right>20</right>
+					<height>1</height>
+					<texture colordiffuse="1Fededed">common/white.png</texture>
+				</control>
+
+				<!-- Prevent close when clicking dialog area -->
+				<control type="button" id="22002">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texturefocus />
+					<texturenofocus />
+					<onclick>noop</onclick>
+				</control>
+			</control>
+
+			<!-- Textbox content area -->
+			<control type="textbox" id="5">
+				<left>40</left>
+				<top>90</top>
+				<right>60</right>
+				<bottom>20</bottom>
+				<font>font13</font>
+				<textcolor>B3ededed</textcolor>
+				<pagecontrol>61</pagecontrol>
+				<scrolltime>200</scrolltime>
+			</control>
+
+			<!-- Scrollbar (hidden, controlled by Python onAction) -->
+			<control type="scrollbar" id="61">
+				<visible>false</visible>
+				<ondown>61</ondown>
+				<onup>61</onup>
+				<orientation>vertical</orientation>
+			</control>
+
+		</control>
+	</controls>
+</window>

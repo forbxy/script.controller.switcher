@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import xbmc
 import xbmcgui
+import xbmcvfs
 import threading
 import xbmcaddon
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
+ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 
 def log(msg, level=xbmc.LOGINFO):
     xbmc.log(f"[{ADDON_ID}] {msg}", level)
@@ -22,11 +24,12 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
         self.extra_id = -1
         self.extra_button = None
 
-    def set_items(self, title, items, preselect=0, extra_button=None):
+    def set_items(self, title, items, preselect=0, extra_button=None, show_back=True):
         self.dialog_title = title
         self.items = items
         self.preselect_index = max(0, preselect) # 防御性编程
         self.extra_button = extra_button
+        self.show_back = show_back
 
     def onInit(self):
         try:
@@ -44,7 +47,7 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
             except Exception:
                 pass
                 
-        # 按需分配按钮：附加按钮（如映射编辑器），其次为返回，然后是退出
+        # 按需分配按钮：附加按钮（如映射编辑器），其次为返回（可选），然后是退出
         btn_idx = 0
         
         if len(available_buttons) > btn_idx and getattr(self, 'extra_button', None):
@@ -55,7 +58,7 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
             except Exception: pass
             btn_idx += 1
             
-        if len(available_buttons) > btn_idx:
+        if len(available_buttons) > btn_idx and getattr(self, 'show_back', True):
             self.back_id = available_buttons[btn_idx].getId()
             try:
                 available_buttons[btn_idx].setVisible(True)
@@ -148,17 +151,51 @@ class CustomSelectDialog(xbmcgui.WindowXMLDialog):
             except Exception:
                 pass
 
-def custom_select(title, items, preselect=0, extra_button=None):
+def custom_select(title, items, preselect=0, extra_button=None, show_back=True):
     import sys
-    dialog = CustomSelectDialog("DialogSelect.xml", "")
-    dialog.set_items(title, items, preselect)
-    dialog.extra_button = extra_button
+    dialog = CustomSelectDialog("CustomDialogSelect.xml", ADDON_PATH, "default", "1080i")
+    dialog.set_items(title, items, preselect, extra_button, show_back)
     dialog.doModal()
     result = dialog.result
     del dialog
     if result == -2:
         sys.exit(0) # 彻底退出整个 addon
     return result
+
+class CustomTextViewerDialog(xbmcgui.WindowXMLDialog):
+    def __init__(self, *args, **kwargs):
+        super(CustomTextViewerDialog, self).__init__(*args, **kwargs)
+        self.dialog_title = ""
+        self.text = ""
+
+    def set_content(self, title, text):
+        self.dialog_title = title
+        self.text = text
+
+    def onInit(self):
+        try:
+            self.getControl(1).setLabel(self.dialog_title)
+        except Exception:
+            pass
+        try:
+            self.getControl(5).setText(self.text)
+        except Exception:
+            pass
+
+    def onAction(self, action):
+        action_id = action.getId()
+        if action_id in (92, 10):
+            self.close()
+        elif action_id in (3, 5):  # ACTION_MOVE_UP, ACTION_PAGE_UP
+            xbmc.executebuiltin('PageUp(61)')
+        elif action_id in (4, 6):  # ACTION_MOVE_DOWN, ACTION_PAGE_DOWN
+            xbmc.executebuiltin('PageDown(61)')
+
+def custom_textviewer(title, text):
+    dialog = CustomTextViewerDialog("CustomDialogTextViewer.xml", ADDON_PATH, "default", "1080i")
+    dialog.set_content(title, text)
+    dialog.doModal()
+    del dialog
 
 def sync_reload_keymaps():
     # 使用同步等待方案：Python 插件在独立线程运行，它的 sleep 不会卡住 Kodi 自身的 UI 动画。

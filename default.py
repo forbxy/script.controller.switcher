@@ -6,7 +6,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
-from utils import sync_reload_keymaps,log, custom_select
+from utils import sync_reload_keymaps,log, custom_select, custom_textviewer
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
@@ -142,7 +142,7 @@ def select_remote(remotes, preselect=-1):
     sorted_remotes = [item[1] for item in processed_remotes]
     items_for_ui = [item[2] for item in processed_remotes]
 
-    index = custom_select('选择控制器', items_for_ui, preselect=preselect, extra_button="打开映射编辑器")
+    index = custom_select('选择控制器', items_for_ui, preselect=preselect, extra_button="打开映射编辑器", show_back=False)
     if index == -3:
         return "EDITOR", False, -1
     if index < 0:
@@ -573,7 +573,7 @@ def show_text_file(filepath, title):
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 text = f.read()
-            xbmcgui.Dialog().textviewer(title, text)
+            custom_textviewer(title, text)
         except Exception as e:
             log(f"读取说明失败: {e}", xbmc.LOGERROR, sound=True)
     else:
@@ -687,11 +687,11 @@ def main():
             
             connect_file = os.path.join(source_dir, 'connect.txt')
             if os.path.exists(connect_file):
-                options.append("连接说明书")
+                options.append("硬件说明书")
                 actions.append("connect")
             desc_file = os.path.join(source_dir, 'desc.txt')
             if os.path.exists(desc_file):
-                options.append("适配说明书")
+                options.append("默认适配说明书")
                 actions.append("desc")
             
             menu_index = custom_select(f"{selected['name']}", options)
@@ -704,10 +704,10 @@ def main():
                 is_in_use = True
                 # 切换成功后直接进入当前遥控器的完整操作菜单（下方）
             elif action == "connect":
-                show_text_file(connect_file, f"{selected['name']} 连接与红外学习说明")
+                show_text_file(connect_file, f"{selected['name']} 说明书")
                 continue
             elif action == "desc":
-                show_text_file(desc_file, f"{selected['name']} 遥控器映射说明")
+                show_text_file(desc_file, f"{selected['name']} 适配说明")
                 continue
             else:
                 continue
@@ -731,7 +731,7 @@ def main():
             actions = []
             connect_file = os.path.join(source_dir, 'connect.txt')
             if os.path.exists(connect_file):
-                options.append("连接说明书")
+                options.append("硬件说明书")
                 actions.append("connect")
 
             options.append("加载默认适配文件")
@@ -868,10 +868,10 @@ def main():
                     clear_deployed_files(selected['path'], selected['name'])
 
             elif action == "connect":
-                show_text_file(connect_file, f"{selected['name']} 连接与红外学习说明")
+                show_text_file(connect_file, f"{selected['name']} 说明书")
                 
             elif action == "desc":
-                show_text_file(desc_file, f"{selected['name']} 遥控器映射说明")
+                show_text_file(desc_file, f"{selected['name']} 适配说明")
                 
             elif action == "edit_default":
                 from custom_keymap import manage_custom_keymap

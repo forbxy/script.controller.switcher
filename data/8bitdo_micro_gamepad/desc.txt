@@ -1,5 +1,3 @@
-8BitDo Micro 手柄按键默认适配说明
-
 适配文件由kodi端映射和joystick配置文件组成
 joystick配置文件适配了udev/linux驱动的kodi手柄和超级任天堂手柄
 kodi端映射默认为竖向握持方式，如不习惯可以选择仅加载joystick配置文件然后自己映射即可

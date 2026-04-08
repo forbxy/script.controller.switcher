@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Standalone DialogSelect - Arctic Horizon dark rounded style -->
+<window>
+	<defaultcontrol always="true">3</defaultcontrol>
+	<animation type="WindowOpen" reversible="false">
+		<effect type="fade" start="0" end="100" time="300" />
+		<effect type="slide" start="0,-48" end="0" tween="back" easing="out" time="400" />
+	</animation>
+	<animation type="WindowClose" reversible="false">
+		<effect type="fade" start="100" end="0" time="200" />
+	</animation>
+	<controls>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<height>750</height>
+			<width>1220</width>
+
+			<!-- Click-to-close overlay -->
+			<control type="button">
+				<left>-2000</left>
+				<top>-2000</top>
+				<width>6000</width>
+				<height>6000</height>
+				<texturefocus />
+				<texturenofocus />
+				<onclick>Action(close)</onclick>
+			</control>
+
+			<!-- Dialog background group -->
+			<control type="group">
+				<width>1220</width>
+				<height>750</height>
+
+				<!-- Shadow -->
+				<control type="image">
+					<left>-20</left>
+					<top>-20</top>
+					<right>-20</right>
+					<bottom>-20</bottom>
+					<texture border="32" colordiffuse="80000000">shadows/shadow-20.png</texture>
+				</control>
+
+				<!-- Rounded dialog background (dark) -->
+				<control type="image">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texture border="16" colordiffuse="FF212125">common/dialog.png</texture>
+				</control>
+
+				<!-- Title bar area -->
+				<control type="label" id="1">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<height>70</height>
+					<font>font32_title</font>
+					<textcolor>FFededed</textcolor>
+					<align>center</align>
+					<aligny>center</aligny>
+					<label></label>
+				</control>
+
+				<!-- Title bottom separator -->
+				<control type="image">
+					<left>20</left>
+					<top>70</top>
+					<right>20</right>
+					<height>1</height>
+					<texture colordiffuse="1Fededed">common/white.png</texture>
+				</control>
+
+				<!-- Prevent close when clicking dialog area -->
+				<control type="button" id="22002">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texturefocus />
+					<texturenofocus />
+					<onclick>noop</onclick>
+				</control>
+			</control>
+
+			<!-- Text-only list (ID 3) -->
+			<control type="list" id="3">
+				<left>20</left>
+				<top>90</top>
+				<width>880</width>
+				<bottom>20</bottom>
+				<onup>3</onup>
+				<ondown>3</ondown>
+				<onleft>9001</onleft>
+				<onright>9001</onright>
+				<pagecontrol>61</pagecontrol>
+				<scrolltime>200</scrolltime>
+				<itemlayout width="880" height="70">
+					<control type="label">
+						<left>20</left>
+						<top>0</top>
+						<right>20</right>
+						<bottom>0</bottom>
+						<align>left</align>
+						<font>font13</font>
+						<aligny>center</aligny>
+						<textcolor>B3ededed</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="880" height="70">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<right>0</right>
+						<bottom>2</bottom>
+						<texture border="12">common/box-gradient.png</texture>
+						<animation effect="fade" start="100" end="0" time="0">UnFocus</animation>
+					</control>
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<right>0</right>
+						<bottom>2</bottom>
+						<texture border="12" colordiffuse="30ededed">common/box.png</texture>
+						<animation effect="fade" start="0" end="100" time="0">UnFocus</animation>
+					</control>
+					<control type="label">
+						<left>20</left>
+						<top>0</top>
+						<right>20</right>
+						<bottom>0</bottom>
+						<align>left</align>
+						<font>font13</font>
+						<aligny>center</aligny>
+						<textcolor>FFededed</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+						<scroll>true</scroll>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<!-- Icon + text list (ID 6) -->
+			<control type="list" id="6">
+				<left>20</left>
+				<top>90</top>
+				<width>880</width>
+				<bottom>20</bottom>
+				<onup>6</onup>
+				<ondown>6</ondown>
+				<onleft>9001</onleft>
+				<onright>9001</onright>
+				<pagecontrol>61</pagecontrol>
+				<scrolltime>200</scrolltime>
+				<itemlayout height="125" width="880">
+					<control type="image">
+						<left>12</left>
+						<top>7</top>
+						<width>110</width>
+						<height>110</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<aspectratio>keep</aspectratio>
+					</control>
+					<control type="label">
+						<left>135</left>
+						<top>0</top>
+						<right>20</right>
+						<height>60</height>
+						<font>font14</font>
+						<aligny>center</aligny>
+						<textcolor>B3ededed</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="textbox">
+						<left>135</left>
+						<top>50</top>
+						<right>20</right>
+						<height>67</height>
+						<font>font12</font>
+						<textcolor>80ededed</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout height="125" width="880">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<right>0</right>
+						<bottom>2</bottom>
+						<texture border="12">common/box-gradient.png</texture>
+						<animation effect="fade" start="100" end="0" time="0">UnFocus</animation>
+					</control>
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<right>0</right>
+						<bottom>2</bottom>
+						<texture border="12" colordiffuse="30ededed">common/box.png</texture>
+						<animation effect="fade" start="0" end="100" time="0">UnFocus</animation>
+					</control>
+					<control type="image">
+						<left>12</left>
+						<top>7</top>
+						<width>110</width>
+						<height>110</height>
+						<texture>$INFO[ListItem.Icon]</texture>
+						<aspectratio>keep</aspectratio>
+					</control>
+					<control type="label">
+						<left>135</left>
+						<top>0</top>
+						<right>20</right>
+						<height>60</height>
+						<aligny>center</aligny>
+						<scroll>true</scroll>
+						<font>font14</font>
+						<textcolor>FFededed</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="textbox">
+						<left>135</left>
+						<top>50</top>
+						<right>20</right>
+						<height>67</height>
+						<font>font12</font>
+						<textcolor>B3ededed</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<!-- Scrollbar -->
+			<control type="scrollbar" id="61">
+				<left>905</left>
+				<top>90</top>
+				<width>10</width>
+				<bottom>20</bottom>
+				<onleft condition="Control.IsVisible(3)">3</onleft>
+				<onleft condition="Control.IsVisible(6)">6</onleft>
+				<onright>9001</onright>
+				<orientation>vertical</orientation>
+			</control>
+
+			<!-- Right panel background (slightly lighter, bottom-right rounded) -->
+			<control type="image">
+				<left>920</left>
+				<top>70</top>
+				<right>0</right>
+				<bottom>0</bottom>
+				<texture border="16" colordiffuse="FF2a2a2e">common/box-br-rounded.png</texture>
+			</control>
+
+			<!-- Buttons (right side) -->
+			<control type="grouplist" id="9001">
+				<left>930</left>
+				<top>90</top>
+				<right>10</right>
+				<onleft condition="Control.IsVisible(6)">6</onleft>
+				<onleft condition="Control.IsVisible(3)">3</onleft>
+				<itemgap>12</itemgap>
+				<onright>3</onright>
+				<control type="button" id="5">
+					<width>280</width>
+					<height>80</height>
+					<label></label>
+					<font>font13</font>
+					<textcolor>B3ededed</textcolor>
+					<focusedcolor>FFededed</focusedcolor>
+					<align>center</align>
+					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+				</control>
+				<control type="button" id="8">
+					<width>280</width>
+					<height>80</height>
+					<label></label>
+					<font>font13</font>
+					<textcolor>B3ededed</textcolor>
+					<focusedcolor>FFededed</focusedcolor>
+					<align>center</align>
+					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+				</control>
+				<control type="button" id="7">
+					<width>280</width>
+					<height>80</height>
+					<label></label>
+					<font>font13</font>
+					<textcolor>B3ededed</textcolor>
+					<focusedcolor>FFededed</focusedcolor>
+					<align>center</align>
+					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+				</control>
+			</control>
+
+			<!-- Controller image (bottom-right, shows focused item's icon) -->
+			<control type="image">
+				<left>935</left>
+				<top>400</top>
+				<width>270</width>
+				<height>270</height>
+				<aspectratio>keep</aspectratio>
+				<texture>$INFO[Container(6).ListItem.Icon]</texture>
+				<visible>Control.IsVisible(6)</visible>
+			</control>
+			<control type="image">
+				<left>935</left>
+				<top>400</top>
+				<width>270</width>
+				<height>270</height>
+				<aspectratio>keep</aspectratio>
+				<texture>$INFO[Container(3).ListItem.Icon]</texture>
+				<visible>Control.IsVisible(3) + !Control.IsVisible(6)</visible>
+			</control>
+		</control>
+	</controls>
+</window>
