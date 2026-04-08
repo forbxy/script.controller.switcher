@@ -41,23 +41,35 @@ ACTIONS = OrderedDict([
         ("activatewindow(programs)", "打开插件/程序页面"),
     ])),
     ("Forbxy插件", OrderedDict([
-        ("runscript(plugin.video.filteredmovies, 0, ?mode=launch_t9)", "加载筛选页面"),
-        ("runscript(plugin.video.filteredmovies, ?mode=select_subtitle)", "加载字幕选择页面"),
-        ("runscript(plugin.video.filteredmovies, ?mode=select_audio)", "加载音轨选择页面"),
-        ("runscript(plugin.video.filteredmovies, ?mode=record_skip_point)", "标记片头/片尾时间点"),
-        ("runscript(plugin.video.filteredmovies, ?mode=delete_skip_point)", "删除片头/片尾时间点标记"),
-        ("runscript(plugin.video.filteredmovies, ?mode=open_playing_tvshow)", "打开当前播放电视剧的剧集列表"),
-        ("runscript(plugin.video.filteredmovies, ?mode=force_prev)", "强制播放上一个"),
-        ("runscript(plugin.video.filteredmovies, ?mode=toggle_favourite)", "将项目添加到收藏夹或从收藏夹移除"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=restart_linux_kodi)", "Linux(coreelec)上强制重启kodi"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=reboot_from_nand)", "coreelec上重启到安卓系统"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode)", "coreelec cpm/avdvplus系上循环切换VS10转码模式"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.dv)", "coreelec cpm/avdvplus系上使用VS10转码为 杜比视界"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.hdr10)", "coreelec cpm/avdvplus系上使用VS10转码为 HDR10"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.sdr)", "coreelec cpm/avdvplus系上使用VS10转码为 SDR"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.original)", "coreelec cpm/avdvplus系上关闭VS10转码"),
+        ("runscript(plugin.video.filteredmovies, 0, ?mode=launch_t9)", "FM:打开筛选页面"),
+        ("runscript(plugin.video.filteredmovies, ?mode=select_subtitle)", "FM:打开字幕选择窗口"),
+        ("runscript(plugin.video.filteredmovies, ?mode=select_audio)", "FM:打开音轨选择窗口"),
+        ("runscript(plugin.video.filteredmovies, ?mode=record_skip_point)", "FM:标记片头/片尾时间点"),
+        ("runscript(plugin.video.filteredmovies, ?mode=delete_skip_point)", "FM:删除片头/片尾时间点标记"),
+        ("runscript(plugin.video.filteredmovies, ?mode=open_playing_tvshow)", "FM:打开当前播放电视剧的剧集列表"),
+        ("runscript(plugin.video.filteredmovies, ?mode=force_prev)", "FM:强制播放上一个"),
+        ("runscript(plugin.video.filteredmovies, ?mode=toggle_favourite)", "FM:将项目添加到收藏夹或从收藏夹移除"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=restart_linux_kodi)", "FM:Linux(CE)上强制重启kodi"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=reboot_from_nand)", "FM:CE上重启到安卓系统"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode)", "FM:CE(cpm/avdvplus系)上循环切换VS10转码模式"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.dv)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 杜比视界"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.hdr10)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 HDR10"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.sdr)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 SDR"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.original)", "FM:CE(cpm/avdvplus系)上关闭VS10转码"),
         ("runscript(plugin.cloudstorage.webdav.refresh)", "刷新WebDAV/OpenList目录"),
         ("runscript(plugin.cloudstorage.webdav.refresh, recursive=true)", "递归刷新WebDAV/OpenList目录"),
+    ])),
+    ("Minsk皮肤", OrderedDict([
+        ("activatewindow(1144)", "minsk:打开字幕选择窗口"),
+        ("activatewindow(1145)", "minsk:打开音轨选择窗口"),
+        ("activatewindow(1116)", "minsk:打开VS10转码模式切换窗口"),
+        ("activatewindow(1126)", "minsk:打开退出播放确认窗口"),
+        ("RunScript(special://skin/scripts/repeat.py)", "minsk:切换音乐循环播放模式"),
+        ("RunScript(special://skin/scripts/tvjump.py,record)", "minsk:标记片头/片尾时间点"),
+        ("RunScript(special://skin/scripts/tvjump.py,delet)", "minsk:删除片头/片尾标记"),
+        ("RunScript(special://skin/scripts/filterlink.py,remote)", "minsk:打开筛选页面"),
+        ("RunScript(special://skin/scripts/rebootoff.py,turnoff)", "minsk:快速重启kodi"),
+        ("activatewindowandfocus(systemsettings, -193,0, -174,2)", "minsk:打开VS10设置页面"),
     ])),
     ("界面导航", OrderedDict([
         ("left", "向左移动"),
@@ -673,10 +685,14 @@ def _record_key_choose_type(controller_type=''):
     return _record_joystick_key()
 
 
+_SKIN_CATEGORIES = {"Minsk皮肤": "skin.confluence.minsk"}
+
 def _select_action():
     """选择一个 action，返回 action 字符串或 None"""
     while True:
-        categories = list(ACTIONS.keys())
+        current_skin = xbmc.getSkinDir()
+        categories = [c for c in ACTIONS.keys()
+                      if c not in _SKIN_CATEGORIES or _SKIN_CATEGORIES[c] == current_skin]
         idx = custom_select("选择动作分类", categories)
         if idx == -1:
             return None
