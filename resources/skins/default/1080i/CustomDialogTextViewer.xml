@@ -47,7 +47,7 @@
 					<top>0</top>
 					<right>0</right>
 					<bottom>0</bottom>
-					<texture border="16" colordiffuse="FF212125">common/dialog.png</texture>
+					<texture border="16" colordiffuse="FF1A2123">common/dialog.png</texture>
 				</control>
 
 				<!-- Title bar area -->

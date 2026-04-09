@@ -2,7 +2,7 @@
 import os
 import shutil
 import xml.etree.ElementTree as ET
-from threading import Timer
+from threading import Thread
 from collections import OrderedDict
 import json
 
@@ -51,6 +51,7 @@ ACTIONS = OrderedDict([
         ("runscript(plugin.video.filteredmovies, ?mode=toggle_favourite)", "FM:将项目添加到收藏夹或从收藏夹移除"),
         ("RunScript(plugin.video.filteredmovies, ?mode=restart_linux_kodi)", "FM:Linux(CE)上强制重启kodi"),
         ("RunScript(plugin.video.filteredmovies, ?mode=reboot_from_nand)", "FM:CE上重启到安卓系统"),
+        ("RunScript(plugin.video.filteredmovies, ?mode=confirm_stop_playback)", "FM:退出播放确认弹窗"),
         ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode)", "FM:CE(cpm/avdvplus系)上循环切换VS10转码模式"),
         ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.dv)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 杜比视界"),
         ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.hdr10)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 HDR10"),
@@ -609,6 +610,7 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
     def __init__(self):
         self.key = None
+        self._countdown_active = False
 
     def onInit(self):
         try:
@@ -623,6 +625,22 @@ class KeyListener(xbmcgui.WindowXMLDialog):
             self.getControl(401).setLabel("请按下要绑定的按键...")
             self.getControl(402).setLabel(f"{self.TIMEOUT} 秒后超时")
 
+        self._countdown_active = True
+        Thread(target=self._countdown, daemon=True).start()
+
+    def _countdown(self):
+        for remaining in range(self.TIMEOUT - 1, 0, -1):
+            xbmc.sleep(1000)
+            if not self._countdown_active:
+                return
+            try:
+                self.getControl(402).setLabel(f"{remaining} 秒后超时")
+            except Exception:
+                return
+        xbmc.sleep(1000)
+        if self._countdown_active:
+            self.close()
+
     def onAction(self, action):
         code = action.getButtonCode()
         if code == 0:
@@ -630,15 +648,13 @@ class KeyListener(xbmcgui.WindowXMLDialog):
         # 去掉长按修饰符，只取基础按键码
         MODIFIER_LONG = 0x01000000
         self.key = str(code & ~MODIFIER_LONG)
+        self._countdown_active = False
         self.close()
 
     @staticmethod
     def record_key():
         dialog = KeyListener()
-        timeout = Timer(KeyListener.TIMEOUT, dialog.close)
-        timeout.start()
         dialog.doModal()
-        timeout.cancel()
         key = dialog.key
         del dialog
         return key

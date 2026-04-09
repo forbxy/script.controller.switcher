@@ -5,7 +5,7 @@ import sys
 import shutil
 from pathlib import Path
 
-REMOTE=True
+REMOTE=False
 
 ADDON_ID = "script.controller.switcher"
 

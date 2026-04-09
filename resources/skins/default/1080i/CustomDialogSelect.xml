@@ -47,7 +47,7 @@
 					<top>0</top>
 					<right>0</right>
 					<bottom>0</bottom>
-					<texture border="16" colordiffuse="FF212125">common/dialog.png</texture>
+					<texture border="16" colordiffuse="FF1A2123">common/dialog.png</texture>
 				</control>
 
 				<!-- Title bar area -->
@@ -115,7 +115,7 @@
 						<top>2</top>
 						<right>0</right>
 						<bottom>2</bottom>
-						<texture border="12">common/box-gradient.png</texture>
+						<texture border="12" colordiffuse="FF0F85A5">common/box.png</texture>
 						<animation effect="fade" start="100" end="0" time="0">UnFocus</animation>
 					</control>
 					<control type="image">
@@ -188,7 +188,7 @@
 						<top>2</top>
 						<right>0</right>
 						<bottom>2</bottom>
-						<texture border="12">common/box-gradient.png</texture>
+						<texture border="12" colordiffuse="FF0F85A5">common/box.png</texture>
 						<animation effect="fade" start="100" end="0" time="0">UnFocus</animation>
 					</control>
 					<control type="image">
@@ -248,7 +248,7 @@
 				<top>70</top>
 				<right>0</right>
 				<bottom>0</bottom>
-				<texture border="16" colordiffuse="FF2a2a2e">common/box-br-rounded.png</texture>
+				<texture border="16" colordiffuse="FF232A2C">common/box-br-rounded.png</texture>
 			</control>
 
 			<!-- Buttons (right side) -->
@@ -268,7 +268,7 @@
 					<textcolor>B3ededed</textcolor>
 					<focusedcolor>FFededed</focusedcolor>
 					<align>center</align>
-					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
 					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
 				</control>
 				<control type="button" id="8">
@@ -279,7 +279,7 @@
 					<textcolor>B3ededed</textcolor>
 					<focusedcolor>FFededed</focusedcolor>
 					<align>center</align>
-					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
 					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
 				</control>
 				<control type="button" id="7">
@@ -290,7 +290,7 @@
 					<textcolor>B3ededed</textcolor>
 					<focusedcolor>FFededed</focusedcolor>
 					<align>center</align>
-					<texturefocus border="12">common/box-gradient.png</texturefocus>
+					<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
 					<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
 				</control>
 			</control>
