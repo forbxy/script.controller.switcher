@@ -11,7 +11,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
-from utils import custom_select,log,sync_reload_keymaps
+from utils import custom_select,log,sync_reload_keymaps,custom_confirm,CustomConfirmDialog
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
@@ -665,7 +665,7 @@ def _record_key_with_longpress():
     key = KeyListener.record_key()
     if key is None:
         return None
-    lp = xbmcgui.Dialog().yesno("选择按键类型", "选择短按触发或长按触发,遥控器的某些按键可能不支持长按！", yeslabel="长按", nolabel="短按")
+    lp = custom_confirm("选择按键类型", "选择短按触发或长按触发,遥控器的某些按键可能不支持长按！", yes_label="长按", no_label="短按") == CustomConfirmDialog.RESULT_YES
     if lp:
         key += ' + longpress'
     return key
@@ -679,7 +679,7 @@ def _record_joystick_key():
     if idx == -1:
         return None
     feature = features[idx]
-    lp = xbmcgui.Dialog().yesno("选择按键类型", "选择短按触发或长按触发", yeslabel="长按", nolabel="短按")
+    lp = custom_confirm("选择按键类型", "选择短按触发或长按触发", yes_label="长按", no_label="短按") == CustomConfirmDialog.RESULT_YES
     key_str = f"joystick:{feature}"
     if lp:
         key_str += " + holdtime=500"
@@ -848,6 +848,18 @@ def _format_mapping(context, action, keycode):
     return f"[[COLOR  yellow]{window_name}[/COLOR]] {key_display}{press_type} -> {action_display}"
 
 
+def _check_conflict(keymap, context, keycode, exclude_idx=None):
+    """检查 keymap 中是否存在相同 context+keycode 的映射，返回冲突项的索引，无冲突返回 -1"""
+    norm_key = keycode.lower().strip()
+    norm_ctx = context.lower().strip()
+    for i, (c, a, k) in enumerate(keymap):
+        if i == exclude_idx:
+            continue
+        if c.lower().strip() == norm_ctx and k.lower().strip() == norm_key:
+            return i
+    return -1
+
+
 def _save_to_disk(keymap, overwrite_path):
     """辅助函数：实时保存内存到磁盘并立刻生效"""
     
@@ -885,7 +897,7 @@ def manage_custom_keymap(overwrite_path, remote_name, controller_type=''):
 
         elif idx == 1:
             # 移除自定义映射
-            if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {remote_name} 的自定义按键吗？"):
+            if custom_confirm('确认移除', f"确定要移除 {remote_name} 的自定义按键吗？") == CustomConfirmDialog.RESULT_YES:
                 keymap.clear()
                 if os.path.exists(overwrite_path):
                     _save_to_disk(keymap, overwrite_path)
@@ -928,6 +940,12 @@ def _edit_custom_keymap_loop(keymap, overwrite_path, controller_type=''):
             if keycode is None:
                 _notification("未捕获到按键", title="取消")
                 continue
+            conflict = _check_conflict(keymap, window, keycode)
+            if conflict >= 0:
+                old_c, old_a, old_k = keymap[conflict]
+                if custom_confirm("映射覆盖确认", f"该按键已经映射为:{_format_mapping(old_c, old_a, old_k)}\n是否覆盖？") != CustomConfirmDialog.RESULT_YES:
+                    continue
+                keymap.pop(conflict)
             keymap.append((window, action, keycode))
             _save_to_disk(keymap, overwrite_path)
             changed = True
@@ -943,12 +961,28 @@ def _edit_custom_keymap_loop(keymap, overwrite_path, controller_type=''):
             if choice == 0:
                 newkey = _record_key_choose_type(controller_type)
                 if newkey:
+                    conflict = _check_conflict(keymap, c, newkey, exclude_idx=mapping_idx)
+                    if conflict >= 0:
+                        old_c, old_a, old_k = keymap[conflict]
+                        if custom_confirm("映射覆盖确认", f"该按键已经映射为:{_format_mapping(old_c, old_a, old_k)}\n是否覆盖？") != CustomConfirmDialog.RESULT_YES:
+                            continue
+                        keymap.pop(conflict)
+                        if conflict < mapping_idx:
+                            mapping_idx -= 1
                     keymap[mapping_idx] = (c, a, newkey)
                     _save_to_disk(keymap, overwrite_path)
                     changed = True
             elif choice == 1:
                 new_window = _select_window()
                 if new_window is not None:
+                    conflict = _check_conflict(keymap, new_window, k, exclude_idx=mapping_idx)
+                    if conflict >= 0:
+                        old_c, old_a, old_k = keymap[conflict]
+                        if custom_confirm("映射覆盖确认", f"该按键已经映射为:{_format_mapping(old_c, old_a, old_k)}\n是否覆盖？") != CustomConfirmDialog.RESULT_YES:
+                            continue
+                        keymap.pop(conflict)
+                        if conflict < mapping_idx:
+                            mapping_idx -= 1
                     keymap[mapping_idx] = (new_window, a, k)
                     _save_to_disk(keymap, overwrite_path)
                     changed = True

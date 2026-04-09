@@ -6,7 +6,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
-from utils import sync_reload_keymaps,log, custom_select, custom_textviewer
+from utils import sync_reload_keymaps,log, custom_select, custom_textviewer, custom_confirm, CustomConfirmDialog
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
@@ -828,7 +828,7 @@ def main():
                     notification(f"joystick 按钮映射文件已是最新", title='提示')
 
             elif action == "clear_joystick_only":
-                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 joystick 按钮映射文件吗？"):
+                if custom_confirm('确认移除', f"确定要移除 {selected['name']} 的 joystick 按钮映射文件吗？") == CustomConfirmDialog.RESULT_YES:
                     joy_files = get_joystick_source_files(selected['path'])
                     cleared = clear_joystick(joy_files)
                     if cleared:
@@ -837,7 +837,7 @@ def main():
                         notification(f"没有找到已部署的 joystick 按钮映射文件", title='提示')
 
             elif action == "clear_hwdb_only":
-                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的 hwdb 文件吗？"):
+                if custom_confirm('确认移除', f"确定要移除 {selected['name']} 的 hwdb 文件吗？") == CustomConfirmDialog.RESULT_YES:
                     hwdb_dir = get_hwdb_dir()
                     cleared = 0
                     if hwdb_dir:
@@ -864,7 +864,7 @@ def main():
                         notification(f"没有找到已部署的 hwdb 文件", title='提示')
                 
             elif action == "clear":
-                if xbmcgui.Dialog().yesno('确认移除', f"确定要移除 {selected['name']} 的适配文件吗？"):
+                if custom_confirm('确认移除', f"确定要移除 {selected['name']} 的适配文件吗？") == CustomConfirmDialog.RESULT_YES:
                     clear_deployed_files(selected['path'], selected['name'])
 
             elif action == "connect":

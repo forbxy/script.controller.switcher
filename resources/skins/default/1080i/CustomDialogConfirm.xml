@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Standalone DialogConfirm - matching CustomDialogSelect style -->
+<window>
+	<defaultcontrol always="true">11</defaultcontrol>
+	<animation type="WindowOpen" reversible="false">
+		<effect type="fade" start="0" end="100" time="300" />
+		<effect type="slide" start="0,-48" end="0" tween="back" easing="out" time="400" />
+	</animation>
+	<animation type="WindowClose" reversible="false">
+		<effect type="fade" start="100" end="0" time="200" />
+	</animation>
+	<controls>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<height>350</height>
+			<width>700</width>
+
+			<!-- Click-to-close overlay -->
+			<control type="button">
+				<left>-2000</left>
+				<top>-2000</top>
+				<width>6000</width>
+				<height>6000</height>
+				<texturefocus />
+				<texturenofocus />
+				<onclick>Action(close)</onclick>
+			</control>
+
+			<!-- Dialog background group -->
+			<control type="group">
+				<width>700</width>
+				<height>350</height>
+
+				<!-- Shadow -->
+				<control type="image">
+					<left>-20</left>
+					<top>-20</top>
+					<right>-20</right>
+					<bottom>-20</bottom>
+					<texture border="32" colordiffuse="80000000">shadows/shadow-20.png</texture>
+				</control>
+
+				<!-- Rounded dialog background -->
+				<control type="image">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texture border="16" colordiffuse="FF1A2123">common/dialog.png</texture>
+				</control>
+
+				<!-- Title bar -->
+				<control type="label" id="1">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<height>70</height>
+					<font>font13</font>
+					<textcolor>FFededed</textcolor>
+					<align>center</align>
+					<aligny>center</aligny>
+					<label></label>
+				</control>
+
+				<!-- Title separator -->
+				<control type="image">
+					<left>20</left>
+					<top>70</top>
+					<right>20</right>
+					<height>1</height>
+					<texture colordiffuse="1Fededed">common/white.png</texture>
+				</control>
+
+				<!-- Prevent close when clicking dialog area -->
+				<control type="button" id="22002">
+					<left>0</left>
+					<top>0</top>
+					<right>0</right>
+					<bottom>0</bottom>
+					<texturefocus />
+					<texturenofocus />
+					<onclick>noop</onclick>
+				</control>
+
+				<!-- Text body -->
+				<control type="textbox" id="9">
+					<left>30</left>
+					<top>85</top>
+					<right>30</right>
+					<bottom>110</bottom>
+					<font>font13</font>
+					<textcolor>B3ededed</textcolor>
+					<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+				</control>
+
+				<!-- Buttons -->
+				<control type="grouplist" id="9000">
+					<orientation>horizontal</orientation>
+					<align>center</align>
+					<left>0</left>
+					<right>0</right>
+					<bottom>10</bottom>
+					<height>80</height>
+					<itemgap>20</itemgap>
+					<!-- Yes (左按钮) -->
+					<control type="button" id="11">
+						<width>200</width>
+						<height>80</height>
+						<label></label>
+						<font>font13</font>
+						<textcolor>B3ededed</textcolor>
+						<focusedcolor>FFededed</focusedcolor>
+						<align>center</align>
+						<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
+						<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+					</control>
+					<!-- No (右按钮) -->
+					<control type="button" id="10">
+						<width>200</width>
+						<height>80</height>
+						<label></label>
+						<font>font13</font>
+						<textcolor>B3ededed</textcolor>
+						<focusedcolor>FFededed</focusedcolor>
+						<align>center</align>
+						<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
+						<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+					</control>
+					<!-- Custom (第三按钮) -->
+					<control type="button" id="12">
+						<width>200</width>
+						<height>80</height>
+						<label></label>
+						<font>font13</font>
+						<textcolor>B3ededed</textcolor>
+						<focusedcolor>FFededed</focusedcolor>
+						<align>center</align>
+						<texturefocus border="12" colordiffuse="FF0F85A5">common/box.png</texturefocus>
+						<texturenofocus border="12" colordiffuse="1Fededed">common/box.png</texturenofocus>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

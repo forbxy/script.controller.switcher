@@ -197,6 +197,93 @@ def custom_textviewer(title, text):
     dialog.doModal()
     del dialog
 
+
+class CustomConfirmDialog(xbmcgui.WindowXMLDialog):
+    RESULT_CANCELLED = -1
+    RESULT_NO = 0
+    RESULT_YES = 1
+    RESULT_CUSTOM = 2
+
+    def __init__(self, *args, **kwargs):
+        super(CustomConfirmDialog, self).__init__(*args, **kwargs)
+        self.dialog_title = ""
+        self.text = ""
+        self.no_label = ""
+        self.yes_label = ""
+        self.custom_label = ""
+        self.default_button = 11
+        self.result = self.RESULT_CANCELLED
+
+    def set_content(self, title, text, no_label="否", yes_label="是",
+                    custom_label="", default_button=11):
+        self.dialog_title = title
+        self.text = text
+        self.no_label = no_label
+        self.yes_label = yes_label
+        self.custom_label = custom_label
+        self.default_button = default_button
+
+    def onInit(self):
+        try:
+            self.getControl(1).setLabel(self.dialog_title)
+        except Exception:
+            pass
+        try:
+            self.getControl(9).setText(self.text)
+        except Exception:
+            pass
+
+        # 按钮10=No, 11=Yes, 12=Custom
+        try:
+            btn_no = self.getControl(10)
+            btn_no.setLabel(self.no_label)
+        except Exception:
+            pass
+        try:
+            btn_yes = self.getControl(11)
+            btn_yes.setLabel(self.yes_label)
+        except Exception:
+            pass
+        try:
+            btn_custom = self.getControl(12)
+            if self.custom_label:
+                btn_custom.setLabel(self.custom_label)
+                btn_custom.setVisible(True)
+            else:
+                btn_custom.setVisible(False)
+        except Exception:
+            pass
+
+        try:
+            self.setFocusId(self.default_button)
+        except Exception:
+            pass
+
+    def onClick(self, controlId):
+        if controlId == 10:
+            self.result = self.RESULT_NO
+        elif controlId == 11:
+            self.result = self.RESULT_YES
+        elif controlId == 12:
+            self.result = self.RESULT_CUSTOM
+        self.close()
+
+    def onAction(self, action):
+        if action.getId() in (92, 10):
+            self.result = self.RESULT_CANCELLED
+            self.close()
+
+
+def custom_confirm(title, text, no_label="否", yes_label="是",
+                   custom_label="", default_button=11):
+    """自定义确认弹窗，返回 RESULT_YES/RESULT_NO/RESULT_CUSTOM/RESULT_CANCELLED"""
+    dialog = CustomConfirmDialog("CustomDialogConfirm.xml", ADDON_PATH, "default", "1080i")
+    dialog.set_content(title, text, no_label, yes_label, custom_label, default_button)
+    dialog.doModal()
+    result = dialog.result
+    del dialog
+    return result
+
 def sync_reload_keymaps():
     # 使用同步等待方案：Python 插件在独立线程运行，它的 sleep 不会卡住 Kodi 自身的 UI 动画。
     # 我们故意让插件暂停 400ms，让上一个菜单的关闭动画彻底播放完毕，
