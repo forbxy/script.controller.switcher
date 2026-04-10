@@ -12,6 +12,7 @@ Homatics高级遥控器(有数字和四色键):data/homatics_premium_remote:linu
 UGOOS_UR02:data/ugoos_ur02:linux_windows_android
 UGOOS_UR01(am6bplus自带):data/ugoos_ur01:linux_windows_android
 T1遥控:data/t1_remote:linux_windows_android
+M5遥控:data/m5_remote:linux_windows_android
 小湃_RC173S(腾讯极光商店单独出售):data/xiaopai_rc173s:linux_windows_android
 小湃_RC173(腾讯极光6S等自带):data/xiaopai_rc173:linux_windows_android
 小湃_RC173_2(腾讯极光5X等自带):data/xiaopai_rc173_2:linux_windows_android
