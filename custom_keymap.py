@@ -49,14 +49,14 @@ ACTIONS = OrderedDict([
         ("runscript(plugin.video.filteredmovies, ?mode=open_playing_tvshow)", "FM:打开当前播放电视剧的剧集列表"),
         ("runscript(plugin.video.filteredmovies, ?mode=force_prev)", "FM:强制播放上一个"),
         ("runscript(plugin.video.filteredmovies, ?mode=toggle_favourite)", "FM:将项目添加到收藏夹或从收藏夹移除"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=restart_linux_kodi)", "FM:Linux(CE)上强制重启kodi"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=reboot_from_nand)", "FM:CE上重启到安卓系统"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=confirm_stop_playback)", "FM:退出播放确认弹窗"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode)", "FM:CE(cpm/avdvplus系)上循环切换VS10转码模式"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.dv)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 杜比视界"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.hdr10)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 HDR10"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.sdr)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 SDR"),
-        ("RunScript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.original)", "FM:CE(cpm/avdvplus系)上关闭VS10转码"),
+        ("runscript(plugin.video.filteredmovies, ?mode=restart_linux_kodi)", "FM:Linux(CE)上强制重启kodi"),
+        ("runscript(plugin.video.filteredmovies, ?mode=reboot_from_nand)", "FM:CE上重启到安卓系统"),
+        ("runscript(plugin.video.filteredmovies, ?mode=confirm_stop_playback)", "FM:退出播放确认弹窗"),
+        ("runscript(plugin.video.filteredmovies, ?mode=set_vs10_mode)", "FM:CE(cpm/avdvplus系)上循环切换VS10转码模式"),
+        ("runscript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.dv)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 杜比视界"),
+        ("runscript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.hdr10)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 HDR10"),
+        ("runscript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.sdr)", "FM:CE(cpm/avdvplus系)上使用VS10转码为 SDR"),
+        ("runscript(plugin.video.filteredmovies, ?mode=set_vs10_mode&target_mode=vs10.original)", "FM:CE(cpm/avdvplus系)上关闭VS10转码"),
         ("runscript(plugin.cloudstorage.webdav.refresh)", "刷新WebDAV/OpenList目录"),
         ("runscript(plugin.cloudstorage.webdav.refresh, recursive=true)", "递归刷新WebDAV/OpenList目录"),
     ])),
@@ -312,10 +312,10 @@ ACTIONS = OrderedDict([
         ("activatewindow(gameviewmode)", "打开游戏视图模式页面"),
         ("activatewindow(skinsettings)", "打开皮肤设置页面"),
         ("activatewindow(addonsettings)", "打开插件设置页面"),
-        ("activatewindow(profilesettings)", "打开配置文件设置页面"),
+        ("activatewindow(profilesettings)", "打开新增用户配置文件页面"),
         ("activatewindow(locksettings)", "打开锁定设置页面"),
         ("activatewindow(contentsettings)", "打开内容设置页面"),
-        ("activatewindow(profiles)", "打开配置文件页面"),
+        ("activatewindow(profiles)", "打开用户配置设置页面"),
         ("activatewindow(testpattern)", "打开测试模式页面"),
         ("activatewindow(screencalibration)", "打开屏幕校准页面"),
         ("activatewindow(loginscreen)", "打开登录屏幕页面"),
@@ -705,14 +705,16 @@ _SKIN_CATEGORIES = {"Minsk皮肤": "skin.confluence.minsk"}
 
 def _select_action():
     """选择一个 action，返回 action 字符串或 None"""
+    last_category_idx = 0
     while True:
         current_skin = xbmc.getSkinDir()
         categories = [c for c in ACTIONS.keys()
                       if c not in _SKIN_CATEGORIES or _SKIN_CATEGORIES[c] == current_skin]
-        idx = custom_select("选择动作分类", categories)
+        idx = custom_select("选择动作分类", categories, preselect=last_category_idx)
         if idx == -1:
             return None
 
+        last_category_idx = idx
         category = categories[idx]
 
         if ACTIONS[category] == "SPECIAL_RUN_ADDON":
