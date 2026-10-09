@@ -618,27 +618,34 @@ class KeyListener(xbmcgui.WindowXMLDialog):
         except Exception:
             pass
 
-        try:
-            self.getControl(401).addLabel("请按下要绑定的按键...")
-            self.getControl(402).addLabel(f"{self.TIMEOUT} 秒后超时")
-        except AttributeError:
-            self.getControl(401).setLabel("请按下要绑定的按键...")
-            self.getControl(402).setLabel(f"{self.TIMEOUT} 秒后超时")
+        self._set_label(401, "请按下要绑定的按键...")
+        self._set_label(402, f"{self.TIMEOUT} 秒后超时")
 
         self._countdown_active = True
         Thread(target=self._countdown, daemon=True).start()
+
+    def _set_label(self, control_id, text):
+        try:
+            control = self.getControl(control_id)
+            if isinstance(control, xbmcgui.ControlFadeLabel):
+                # FadeLabel 没有 setLabel，先清空旧内容再添加，避免轮播旧倒计时。
+                control.reset()
+                control.addLabel(text)
+            else:
+                control.setLabel(text)
+        except Exception as exc:
+            # 皮肤控件更新失败不能中断超时关闭。
+            log(f"按键捕获窗口更新控件 {control_id} 失败: {exc}", xbmc.LOGWARNING)
 
     def _countdown(self):
         for remaining in range(self.TIMEOUT - 1, 0, -1):
             xbmc.sleep(1000)
             if not self._countdown_active:
                 return
-            try:
-                self.getControl(402).setLabel(f"{remaining} 秒后超时")
-            except Exception:
-                return
+            self._set_label(402, f"{remaining} 秒后超时")
         xbmc.sleep(1000)
         if self._countdown_active:
+            self._countdown_active = False
             self.close()
 
     def onAction(self, action):
@@ -654,10 +661,12 @@ class KeyListener(xbmcgui.WindowXMLDialog):
     @staticmethod
     def record_key():
         dialog = KeyListener()
-        dialog.doModal()
-        key = dialog.key
-        del dialog
-        return key
+        try:
+            dialog.doModal()
+            return dialog.key
+        finally:
+            dialog._countdown_active = False
+            del dialog
 
 
 def _record_key_with_longpress():
